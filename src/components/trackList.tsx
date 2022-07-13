@@ -1,5 +1,5 @@
 import { Grid, Text } from "@nextui-org/react";
-import TrackCard from "./trackCard";
+import TrackCard from "./TrackCard";
 
 interface trackListProps {
   tracks?: SpotifyApi.TrackObjectFull[];
@@ -8,7 +8,7 @@ interface trackListProps {
 const TrackList = (props: trackListProps) => {
   return (
     <div>
-      <Grid.Container justify={"center"}>
+      <Grid.Container gap={0.5} justify={"center"}>
         {props.tracks?.map((track) => (
           <Grid key={track.id}>
             <TrackCard

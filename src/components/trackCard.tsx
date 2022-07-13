@@ -11,7 +11,7 @@ const TrackCard = (props: TrackCardProps) => {
   const artists = props.artistNames.join(", ");
 
   return (
-    <Card css={{ w: "200px", h: "200px", p: 0 }} isPressable>
+    <Card css={{ w: "200px", h: "200px", p: 0, border: "none" }} isPressable>
       <Card.Body css={{ p: 0 }}>
         <Card.Image
           src={props.cover}

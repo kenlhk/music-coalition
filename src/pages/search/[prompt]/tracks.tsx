@@ -1,4 +1,4 @@
-import { Button, Loading, Spinner, Text } from "@nextui-org/react";
+import { Button, Loading, Progress, Spinner, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import { unstable_getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "react-query";
-import TrackList from "../../../components/trackList";
+import TrackList from "../../../components/TrackList";
 import { queryClient } from "../../../lib/react-query";
 import { spotifyApiClient, spotifyWebApi } from "../../../lib/spotify";
 import { authOptions } from "../../api/auth/[...nextauth]";
@@ -18,7 +18,7 @@ interface searchTracksProps {
 const SearchTracks = (props: searchTracksProps) => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const query = router.query.query;
+  const prompt = router.query.prompt;
   const [ref, inView] = useInView();
 
   const fetcher = async ({ pageParam = "" }) => {
@@ -36,7 +36,7 @@ const SearchTracks = (props: searchTracksProps) => {
     }
 
     const res = await spotifyWebApi
-      .search(query as string, ["track"])
+      .search(prompt as string, ["track"], { limit: 25 })
       .then((res) => res.body.tracks);
 
     return res;
@@ -48,6 +48,7 @@ const SearchTracks = (props: searchTracksProps) => {
         return lastPage?.next;
       },
       enabled: status === "authenticated" && router.isReady,
+      cacheTime: 0,
     });
 
   useEffect(() => {
@@ -60,7 +61,13 @@ const SearchTracks = (props: searchTracksProps) => {
     <div>
       <Text h1>Tracks</Text>
       {isLoading ? (
-        <Loading />
+        <Progress
+          indeterminated
+          value={50}
+          color="primary"
+          status="primary"
+          size={"sm"}
+        />
       ) : (
         <div>
           <TrackList tracks={data?.pages.flatMap((page) => page.items)} />
