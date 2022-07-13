@@ -1,12 +1,15 @@
 import { Card, Col, Row, Text } from "@nextui-org/react";
 
-interface Props {
+interface TrackCardProps {
+  key: string;
   name: string;
-  artist: string;
+  artistNames: string[];
   cover: string;
 }
 
-const TrackCard = (props: Props) => {
+const TrackCard = (props: TrackCardProps) => {
+  const artists = props.artistNames.join(", ");
+
   return (
     <Card css={{ w: "200px", h: "200px", p: 0 }} isPressable>
       <Card.Body css={{ p: 0 }}>
@@ -15,7 +18,7 @@ const TrackCard = (props: Props) => {
           width="100%"
           height="100%"
           objectFit="cover"
-          alt="Card example background"
+          alt="Album cover"
         />
       </Card.Body>
       <Card.Footer
@@ -26,17 +29,17 @@ const TrackCard = (props: Props) => {
           bottom: 0,
           zIndex: 1,
           pl: "5%",
-          pt: "1%",
+          pt: "0%",
           pb: "1%",
         }}
       >
         <Row>
           <Col>
-            <Text color="#FFF" size={"80%"} b>
+            <Text className="font-bold truncate" color="#FFF" size={"80%"}>
               {props.name}
             </Text>
-            <Text color="#FFF" size={"80%"}>
-              {props.artist}
+            <Text className="truncate" color="#FFF" size={"70%"}>
+              {artists}
             </Text>
           </Col>
         </Row>

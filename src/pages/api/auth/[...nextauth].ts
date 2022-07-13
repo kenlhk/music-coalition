@@ -1,14 +1,15 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import SpotifyProvider from "next-auth/providers/spotify";
-import spotifyApi from "../../../lib/spotify";
+import SpotifyWebApi from "spotify-web-api-node";
+import { spotifyApiClient, spotifyWebApi } from "../../../lib/spotify";
 
 const refreshAccessToken = async (token: JWT) => {
   try {
-    spotifyApi.setAccessToken(token.accessToken);
-    spotifyApi.setRefreshToken(token.refreshToken);
+    spotifyWebApi.setAccessToken(token.accessToken);
+    spotifyWebApi.setRefreshToken(token.refreshToken);
 
-    const { body: refreshedToken } = await spotifyApi.refreshAccessToken();
+    const { body: refreshedToken } = await spotifyWebApi.refreshAccessToken();
 
     return {
       ...token,
@@ -61,7 +62,7 @@ export const authOptions: NextAuthOptions = {
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
       session.accessTokenExpires = token.accessTokenExpires;
-      
+
       return session;
     },
   },
