@@ -1,60 +1,14 @@
-import {
-  Col,
-  Container,
-  FormElement,
-  Input,
-  Row,
-  Text,
-  User,
-} from "@nextui-org/react";
-import { getToken } from "next-auth/jwt";
+import { Col, Row, Text, User } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  KeyboardEventHandler,
-  ReactNode,
-  useState,
-} from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { ReactNode } from "react";
+
+const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
 interface MainLayoutProps {
   children: ReactNode;
 }
-
-const SearchBar = () => {
-  const [query, setQuery] = useState("");
-  const router = useRouter();
-
-  const onChange = (e: ChangeEvent<FormElement>) => {
-    setQuery(e.currentTarget.value);
-  };
-
-  const onKeyDown = (e: KeyboardEvent<FormElement>) => {
-    if (e.key === "Enter" && query) {
-      router.push(
-        {
-          pathname: "/search/[prompt]/tracks",
-          query: { prompt: query },
-        },
-        undefined,
-        { shallow: false, scroll: true }
-      );
-    }
-  };
-
-  return (
-    <Input
-      type={"search"}
-      size="xl"
-      width="100%"
-      onKeyDown={onKeyDown}
-      onChange={onChange}
-      labelPlaceholder="Search"
-      animated={false}
-    />
-  );
-};
 
 const NavBar = () => {
   const { data: session, status } = useSession();
@@ -64,7 +18,7 @@ const NavBar = () => {
       <Row>
         <Col>
           <Text h2 weight={"bold"} color="primary">
-            MusicCube
+            <Link href={"/"}>MusicCube</Link>
           </Text>
         </Col>
         <Col>
@@ -85,10 +39,10 @@ const NavBar = () => {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <>
+    <div>
       <NavBar />
-      <div>{children}</div>
-    </>
+      <div className="pl-5 pr-5">{children}</div>
+    </div>
   );
 };
 

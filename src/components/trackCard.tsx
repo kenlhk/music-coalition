@@ -11,14 +11,14 @@ const TrackCard = (props: TrackCardProps) => {
   const artists = props.artistNames.join(", ");
 
   return (
-    <Card css={{ w: "200px", h: "200px", p: 0, border: "none" }} isPressable>
+    <Card css={{ border: "none" }} isPressable>
       <Card.Body css={{ p: 0 }}>
         <Card.Image
           src={props.cover}
-          width="100%"
-          height="100%"
           objectFit="cover"
           alt="Album cover"
+          height={"180px"}
+          width={"180px"}
         />
       </Card.Body>
       <Card.Footer
