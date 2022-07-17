@@ -17,7 +17,13 @@ const NavBar = () => {
     <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 p-1">
       <Row>
         <Col>
-          <Text h2 weight={"bold"} color="primary">
+          <Text
+            h2
+            weight={"bold"}
+            css={{
+              textGradient: "45deg, $blue600 -20%, $pink600 50%",
+            }}
+          >
             <Link href={"/"}>MusicCube</Link>
           </Text>
         </Col>
@@ -41,7 +47,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div>
       <NavBar />
-      <div className="pl-5 pr-5">{children}</div>
+      <div className="p-5">{children}</div>
     </div>
   );
 };

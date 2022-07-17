@@ -1,7 +1,18 @@
-import { Avatar, Button, Image, Link, Text } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Col,
+  Container,
+  Image,
+  Link,
+  Row,
+  Text
+} from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { youtube } from "scrape-youtube";
+import Youtube from "scrape-youtube/lib/interface";
 import {
   serverAccessToken,
   spotifyApiWrapper,
@@ -14,11 +25,12 @@ interface trackProps {
   track: SpotifyApi.TrackObjectFull;
   artists: SpotifyApi.ArtistObjectFull[];
   album: SpotifyApi.AlbumObjectFull;
+  videos?: Youtube.Video[];
+  lyrics?: string;
 }
 
 const Track = (props: trackProps) => {
   const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   const handlePlayPause = () => {
     setPlaying(!playing);
@@ -36,9 +48,10 @@ const Track = (props: trackProps) => {
         {props.artists.map((artist, index) => (
           <Avatar
             key={index}
-            size="xl"
+            css={{ size: "$20", zIndex: 0 }}
             pointer
-            src={artist.images[2].url}
+            src={artist.images.length > 0 ? artist.images[2].url : ""}
+            text={artist.images.length == 0 ? artist.name : ""}
             bordered
             color="gradient"
             stacked
@@ -55,32 +68,73 @@ const Track = (props: trackProps) => {
       ) : (
         <p>No Album Cover</p>
       )}
-      {props.track.preview_url ? (
-        <div>
-          <p>Preview:</p>
-          <ReactPlayer
-            key={"react-player"}
-            url={props.track.preview_url}
-            playing={playing}
-            width={0}
-            height={0}
-            onPause={handlePause}
-          />
-          <Button onClick={handlePlayPause}>
-            {playing ? "Pause" : "Play"}
-          </Button>
-        </div>
-      ) : (
-        <p>No preview available.</p>
-      )}
-      {props.track.external_urls.spotify && (
-        <div>
-          <p>Play full song on Spotify:</p>
-          <Link href={props.track.external_urls.spotify} target="_blank">
-            Link
-          </Link>
-        </div>
-      )}
+
+      <br />
+      <br />
+      <Container>
+        <Row>
+          <Col>
+            <Text h3>Preview:</Text>
+            {props.track.preview_url ? (
+              <div>
+                <ReactPlayer
+                  key={"react-player"}
+                  url={props.track.preview_url}
+                  playing={playing}
+                  width={0}
+                  height={0}
+                  onPause={handlePause}
+                />
+                <Button onClick={handlePlayPause}>
+                  {playing ? "Pause" : "Play"}
+                </Button>
+              </div>
+            ) : (
+              <p>No preview available.</p>
+            )}
+          </Col>
+          <Col>
+            <Text h3>Full Song:</Text>
+            {props.track.external_urls.spotify && (
+              <div>
+                <Link href={props.track.external_urls.spotify} target="_blank">
+                  Spotify
+                </Link>
+              </div>
+            )}
+          </Col>
+        </Row>
+      </Container>
+      <br />
+      <br />
+      <Container>
+        <Row>
+          <Col>
+            <Text h3>Related Videos:</Text>
+            {props.videos ? (
+              props.videos
+                .filter((video, index) => index < 5)
+                .map((video, index) => (
+                  <ReactPlayer
+                    key={index}
+                    url={video.link}
+                    config={{ youtube: { playerVars: { controls: 1 } } }}
+                  />
+                ))
+            ) : (
+              <p>No video found.</p>
+            )}
+          </Col>
+          <Col>
+            <Text h3>Lyrics:</Text>
+            {props.lyrics ? (
+              <span style={{ whiteSpace: "pre-line" }}>{props.lyrics}</span>
+            ) : (
+              <p>No lyrics found.</p>
+            )}
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };
@@ -105,11 +159,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     })
   );
 
+  const artistsQueryString = artists.map((artist) => artist.name).join(" ");
+
+  const { videos } = await youtube.search(
+    `${track.name} ${artistsQueryString}`
+  );
+
+  const Genius = require("genius-lyrics");
+  const Client = new Genius.Client();
+  let lyrics;
+  try {
+    const searches = await Client.songs.search(
+      `${track.name} ${artistsQueryString}`
+    );
+    const firstSong = searches[0];
+    lyrics = await firstSong.lyrics();
+  } catch (error) {
+    (error: Error) => console.log(error);
+  }
+
   return {
     props: {
       track: track,
       artists: artists,
       album: track.album,
+      videos: videos || null,
+      lyrics: lyrics || null,
     },
   };
 };

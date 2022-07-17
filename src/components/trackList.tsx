@@ -7,8 +7,6 @@ interface trackListProps {
 }
 
 const TrackList = (props: trackListProps) => {
-  console.log(props.tracks?.map((track) => console.log(track.album)));
-
   return (
     <div>
       <Grid.Container gap={0.5} justify={"center"}>
