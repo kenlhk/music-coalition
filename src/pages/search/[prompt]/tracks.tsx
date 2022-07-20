@@ -1,14 +1,12 @@
-import { Progress, Text } from "@nextui-org/react";
-import { GetServerSideProps } from "next";
+import { Grid, Text } from "@nextui-org/react";
+import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useInView } from "react-intersection-observer";
+import { useState } from "react";
 import { useInfiniteQuery } from "react-query";
-import TrackList from "../../../components/TrackList";
-import {
-  serverAccessToken,
-  spotifyApiWrapper,
-  spotifyAxiosClient,
-} from "../../../lib/spotify";
+import { VirtuosoGrid } from "react-virtuoso";
+import TrackCard from "../../../components/TrackCard";
+import { spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
 
 interface searchTracksProps {
   serverAccessToken: string;
@@ -18,17 +16,19 @@ interface searchTracksProps {
 const SearchTracks = (props: searchTracksProps) => {
   const router = useRouter();
   const prompt = router.query.prompt;
-  const [ref, inView] = useInView();
+  const [tracks, setTracks] = useState<SpotifyApi.TrackObjectFull[]>([]);
 
   const fetcher = async ({ pageParam = "" }) => {
-    const serverAccessToken = props.serverAccessToken;
-    spotifyApiWrapper.setAccessToken(serverAccessToken);
+    const {
+      data: { accessToken },
+    } = await axios.get("/api/auth/token");
+    spotifyApiWrapper.setAccessToken(accessToken);
 
     if (pageParam !== "") {
       const res = await spotifyAxiosClient
         .get(pageParam, {
           headers: {
-            Authorization: `Bearer ${serverAccessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         })
         .then((res) => res.data.tracks);
@@ -42,28 +42,24 @@ const SearchTracks = (props: searchTracksProps) => {
     return res;
   };
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-    isFetchingNextPage,
-    isFetching,
-    error,
-  } = useInfiniteQuery("tracks", fetcher, {
-    getNextPageParam: (lastPage) => {
-      return lastPage?.next;
-    },
-    enabled: router.isReady,
-    cacheTime: 0,
-    staleTime: 0,
-  });
+  const { fetchNextPage, hasNextPage, error } = useInfiniteQuery(
+    "tracks",
+    fetcher,
+    {
+      getNextPageParam: (lastPage) => {
+        return lastPage?.next;
+      },
+      enabled: router.isReady,
+      cacheTime: 0,
+      staleTime: 0,
+      onSuccess: (data) =>
+        updateAllItems(data?.pages.flatMap((page) => page.items)),
+    }
+  );
 
-  const allItems = data?.pages.flatMap((page) => page.items);
-
-  if (inView && router.isReady && hasNextPage) {
-    fetchNextPage();
-  }
+  const updateAllItems = (items: SpotifyApi.TrackObjectFull[]) => {
+    setTracks(items);
+  };
 
   if (error) {
     console.log(error);
@@ -71,23 +67,46 @@ const SearchTracks = (props: searchTracksProps) => {
 
   return (
     <div>
-      <Text h1 className="pl-5">
-        Tracks
-      </Text>
-      {isLoading ? (
-        <Progress
-          indeterminated
-          value={50}
-          color="primary"
-          status="primary"
-          size={"sm"}
-        />
-      ) : (
-        <div>
-          <TrackList tracks={allItems} />
-          <div ref={ref} />
-        </div>
-      )}
+      <Text h2>Tracks</Text>
+      <VirtuosoGrid
+        style={{ height: "77vh" }}
+        totalCount={tracks.length}
+        endReached={() => {
+          fetchNextPage();
+        }}
+        components={{
+          Item: Grid,
+          List: Grid.Container,
+        }}
+        itemContent={(index) => (
+          <Grid>
+            <Link
+              href={{
+                pathname: "/track/[trackId]",
+                query: {
+                  trackId: tracks[index].id,
+                },
+              }}
+            >
+              <a>
+                <TrackCard
+                  key={index.toString()}
+                  name={tracks[index].name}
+                  artistNames={tracks[index].artists.map(
+                    (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
+                  )}
+                  cover={
+                    tracks[index].album.images.length != 0
+                      ? tracks[index].album.images[1].url
+                      : ""
+                  }
+                />
+              </a>
+            </Link>
+          </Grid>
+        )}
+      />
+
       {hasNextPage && (
         <div className="fixed bottom-0 w-full flex justify-center">
           <button
@@ -100,15 +119,6 @@ const SearchTracks = (props: searchTracksProps) => {
       )}
     </div>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await serverAccessToken;
-  return {
-    props: {
-      serverAccessToken: accessToken,
-    },
-  };
 };
 
 // TODO: SSR initial tracks

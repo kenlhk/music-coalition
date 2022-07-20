@@ -1,8 +1,9 @@
-import { Col, Row, Text, User } from "@nextui-org/react";
+import { Col, Progress, Row, Text, User } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { Router } from "next/router";
+import { ReactNode, useState } from "react";
 
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
@@ -13,8 +14,36 @@ interface MainLayoutProps {
 const NavBar = () => {
   const { data: session, status } = useSession();
 
+  const [loading, setLoading] = useState(false);
+
+  Router.events.on("routeChangeStart", (url) => {
+    setLoading(true);
+  });
+
+  Router.events.on("routeChangeComplete", () => {
+    setLoading(false);
+  });
+
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 p-1">
+    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 pb-0.5">
+      <Row>
+        {loading ? (
+          <Progress
+            indeterminated
+            value={50}
+            color="primary"
+            css={{ background: "none" }}
+            size={"xs"}
+          />
+        ) : (
+          <Progress
+            value={0}
+            color="primary"
+            size={"xs"}
+            css={{ background: "none" }}
+          />
+        )}
+      </Row>
       <Row>
         <Col>
           <Text

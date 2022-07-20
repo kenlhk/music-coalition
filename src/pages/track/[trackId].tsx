@@ -1,13 +1,5 @@
-import {
-  Avatar,
-  Button,
-  Col,
-  Container,
-  Image,
-  Link,
-  Row,
-  Text
-} from "@nextui-org/react";
+import { Avatar, Button, Grid, Image, Link, Text } from "@nextui-org/react";
+import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -68,73 +60,64 @@ const Track = (props: trackProps) => {
       ) : (
         <p>No Album Cover</p>
       )}
+      <br />
+
+      <Text h3>Preview:</Text>
+      {props.track.preview_url ? (
+        <div>
+          <ReactPlayer
+            key={"react-player"}
+            url={props.track.preview_url}
+            playing={playing}
+            width={0}
+            height={0}
+            onPause={handlePause}
+          />
+          <Button onClick={handlePlayPause} className="z-0">
+            {playing ? "Pause" : "Play"}
+          </Button>
+        </div>
+      ) : (
+        <p>No preview available.</p>
+      )}
+      <br />
+      <Text h3>Play full song on:</Text>
+      {props.track.external_urls.spotify && (
+        <div>
+          <Link href={props.track.external_urls.spotify} target="_blank">
+            Spotify
+          </Link>
+        </div>
+      )}
 
       <br />
       <br />
-      <Container>
-        <Row>
-          <Col>
-            <Text h3>Preview:</Text>
-            {props.track.preview_url ? (
-              <div>
+      <Grid.Container gap={5}>
+        <Grid>
+          <Text h3>Related Videos:</Text>
+          {props.videos ? (
+            props.videos
+              .filter((video, index) => index < 5)
+              .map((video, index) => (
                 <ReactPlayer
-                  key={"react-player"}
-                  url={props.track.preview_url}
-                  playing={playing}
-                  width={0}
-                  height={0}
-                  onPause={handlePause}
+                  key={index}
+                  url={video.link}
+                  config={{ youtube: { playerVars: { controls: 1 } } }}
                 />
-                <Button onClick={handlePlayPause}>
-                  {playing ? "Pause" : "Play"}
-                </Button>
-              </div>
-            ) : (
-              <p>No preview available.</p>
-            )}
-          </Col>
-          <Col>
-            <Text h3>Full Song:</Text>
-            {props.track.external_urls.spotify && (
-              <div>
-                <Link href={props.track.external_urls.spotify} target="_blank">
-                  Spotify
-                </Link>
-              </div>
-            )}
-          </Col>
-        </Row>
-      </Container>
-      <br />
-      <br />
-      <Container>
-        <Row>
-          <Col>
-            <Text h3>Related Videos:</Text>
-            {props.videos ? (
-              props.videos
-                .filter((video, index) => index < 5)
-                .map((video, index) => (
-                  <ReactPlayer
-                    key={index}
-                    url={video.link}
-                    config={{ youtube: { playerVars: { controls: 1 } } }}
-                  />
-                ))
-            ) : (
-              <p>No video found.</p>
-            )}
-          </Col>
-          <Col>
-            <Text h3>Lyrics:</Text>
-            {props.lyrics ? (
-              <span style={{ whiteSpace: "pre-line" }}>{props.lyrics}</span>
-            ) : (
-              <p>No lyrics found.</p>
-            )}
-          </Col>
-        </Row>
-      </Container>
+              ))
+          ) : (
+            <p>No video found.</p>
+          )}
+        </Grid>
+        <Grid>
+          <Text h3>Lyrics:</Text>
+          {props.lyrics ? (
+            <span style={{ whiteSpace: "pre-line" }}>{props.lyrics}</span>
+          ) : (
+            <p>No lyrics found.</p>
+          )}
+        </Grid>
+      </Grid.Container>
     </div>
   );
 };
@@ -161,15 +144,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const artistsQueryString = artists.map((artist) => artist.name).join(" ");
 
+  // Fetch videos from YouTube
   const { videos } = await youtube.search(
     `${track.name} ${artistsQueryString}`
   );
 
-  const Genius = require("genius-lyrics");
-  const Client = new Genius.Client();
+  // Fetch lyrics from Genius
+  const client = new Genius.Client();
   let lyrics;
   try {
-    const searches = await Client.songs.search(
+    const searches = await client.songs.search(
       `${track.name} ${artistsQueryString}`
     );
     const firstSong = searches[0];
