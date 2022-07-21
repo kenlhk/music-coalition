@@ -5,20 +5,15 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
+import ArtistCard from "../../../components/ArtistCard";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
-import TrackCard from "../../../components/TrackCard";
 import { spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
 
-interface searchTracksProps {
-  serverAccessToken: string;
-  initialTracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>;
-}
-
-const TrackSearch = (props: searchTracksProps) => {
+const ArtistSearch = () => {
   const router = useRouter();
   const prompt = router.query.prompt;
-  const [tracks, setTracks] = useState<SpotifyApi.TrackObjectFull[]>([]);
+  const [artists, setArtists] = useState<SpotifyApi.ArtistObjectFull[]>([]);
 
   const fetcher = async ({ pageParam = "" }) => {
     const {
@@ -33,19 +28,19 @@ const TrackSearch = (props: searchTracksProps) => {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-        .then((res) => res.data.tracks);
+        .then((res) => res.data.artists);
       return res;
     }
 
     const res = await spotifyApiWrapper
-      .search(prompt as string, ["track"], { limit: 30 })
-      .then((res) => res.body.tracks);
+      .search(prompt as string, ["artist"], { limit: 30 })
+      .then((res) => res.body.artists);
 
     return res;
   };
 
   const { fetchNextPage, hasNextPage, error } = useInfiniteQuery(
-    "tracks",
+    "artists",
     fetcher,
     {
       getNextPageParam: (lastPage) => {
@@ -54,13 +49,14 @@ const TrackSearch = (props: searchTracksProps) => {
       enabled: router.isReady,
       cacheTime: 0,
       staleTime: 0,
-      onSuccess: (data) =>
-        updateTracks(data?.pages.flatMap((page) => page.items)),
+      onSuccess: (data) => {
+        updateArtists(data?.pages.flatMap((page) => page.items));
+      },
     }
   );
 
-  const updateTracks = (items: SpotifyApi.TrackObjectFull[]) => {
-    setTracks(items);
+  const updateArtists = (items: SpotifyApi.ArtistObjectFull[]) => {
+    setArtists(items);
   };
 
   if (error) {
@@ -80,8 +76,8 @@ const TrackSearch = (props: searchTracksProps) => {
   return (
     <div>
       <VirtuosoGrid
-        style={{ height: "77vh", width: "$", overflowX: "hidden" }}
-        totalCount={tracks.length}
+        style={{ height: "77vh", overflowX: "hidden" }}
+        totalCount={artists.length}
         endReached={() => {
           fetchNextPage();
         }}
@@ -94,20 +90,17 @@ const TrackSearch = (props: searchTracksProps) => {
             <Grid>
               <Link
                 href={{
-                  pathname: "/track/[trackId]",
+                  pathname: "/artist/[artistId]",
                   query: {
-                    trackId: tracks[index].id,
+                    artistId: artists[index].id,
                   },
                 }}
               >
                 <a>
-                  <TrackCard
+                  <ArtistCard
                     key={index.toString()}
-                    name={tracks[index].name}
-                    artistNames={tracks[index].artists.map(
-                      (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
-                    )}
-                    cover={tracks[index].album?.images[1]?.url}
+                    name={artists[index].name}
+                    image={artists[index].images[1]?.url}
                   />
                 </a>
               </Link>
@@ -121,29 +114,8 @@ const TrackSearch = (props: searchTracksProps) => {
   );
 };
 
-TrackSearch.getLayout = function getLayout(page: ReactNode) {
+ArtistSearch.getLayout = function getLayout(page: ReactNode) {
   return <SearchLayout>{page}</SearchLayout>;
 };
 
-// TODO: SSR initial tracks
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const session = await unstable_getServerSession(
-//     context.req,
-//     context.res,
-//     authOptions
-//   );
-//   const accessToken = session?.accessToken as string;
-//   spotifyWebApi.setAccessToken(accessToken);
-
-//   const res = await spotifyWebApi.search(context.query.query as string, [
-//     "track",
-//   ]);
-
-//   return {
-//     props: {
-//       initialTracks: res.body.tracks,
-//     },
-//   };
-// };
-
-export default TrackSearch;
+export default ArtistSearch;

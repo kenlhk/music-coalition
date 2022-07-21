@@ -1,22 +1,19 @@
 import { Card, Col, Row, Text } from "@nextui-org/react";
 
-interface TrackCardProps {
+interface ArtistCardProps {
   key: string;
   name: string;
-  artistNames: string[];
-  cover?: string;
+  image?: string;
 }
 
-const TrackCard = (props: TrackCardProps) => {
-  const artists = props.artistNames.join(", ");
-
+const ArtistCard = (props: ArtistCardProps) => {
   return (
-    <Card css={{ border: "none" }} isPressable>
+    <Card css={{ border: "none"}} isPressable>
       <Card.Body css={{ p: 0 }}>
         <Card.Image
-          src={props.cover || ""}
+          src={props.image || ""}
           objectFit="cover"
-          alt="Album cover"
+          alt="Artist image"
           height={"180px"}
           width={"180px"}
         />
@@ -35,11 +32,8 @@ const TrackCard = (props: TrackCardProps) => {
       >
         <Row>
           <Col>
-            <Text className="font-bold truncate" color="#FFF" size={"80%"}>
+            <Text className="font-bold truncate" color="#FFF" size={"100%"}>
               {props.name}
-            </Text>
-            <Text className="truncate" color="#FFF" size={"70%"}>
-              {artists}
             </Text>
           </Col>
         </Row>
@@ -48,4 +42,4 @@ const TrackCard = (props: TrackCardProps) => {
   );
 };
 
-export default TrackCard;
+export default ArtistCard;

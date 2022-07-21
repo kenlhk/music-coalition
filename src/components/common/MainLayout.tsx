@@ -16,7 +16,7 @@ const NavBar = () => {
 
   const [loading, setLoading] = useState(false);
 
-  Router.events.on("routeChangeStart", (url) => {
+  Router.events.on("routeChangeStart", () => {
     setLoading(true);
   });
 
@@ -25,7 +25,7 @@ const NavBar = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 pb-0.5">
+    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90">
       <Row>
         {loading ? (
           <Progress
@@ -44,7 +44,7 @@ const NavBar = () => {
           />
         )}
       </Row>
-      <Row>
+      <Row className="pb-0.5 pl-2 pr-2">
         <Col>
           <Text
             h2

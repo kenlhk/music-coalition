@@ -73,7 +73,7 @@ const Track = (props: trackProps) => {
             height={0}
             onPause={handlePause}
           />
-          <Button onClick={handlePlayPause} className="z-0">
+          <Button onPress={handlePlayPause} className="z-0">
             {playing ? "Pause" : "Play"}
           </Button>
         </div>
