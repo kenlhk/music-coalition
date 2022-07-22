@@ -6,7 +6,7 @@ import {
   Modal,
   Row,
   Text,
-  Tooltip
+  Tooltip,
 } from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
@@ -21,7 +21,7 @@ import VideoCard from "../../components/VideoCard";
 import {
   serverAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../lib/spotify";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -35,8 +35,6 @@ interface trackProps {
 }
 
 const Track = (props: trackProps) => {
-  console.log(props.videos);
-
   const [videoLink, setVideoLink] = useState("");
   const [playing, setPlaying] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -151,7 +149,7 @@ const Track = (props: trackProps) => {
           )}
         </Col>
       </Row>
-      <br/>
+      <br />
       <Tabs.Tabs defaultValue="tab1">
         <Tabs.TabsList>
           <Tabs.TabsTrigger value="tab1">

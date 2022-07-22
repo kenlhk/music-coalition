@@ -1,11 +1,10 @@
-import type { NextPage } from "next";
-import Login from "../components/Login";
+import LoginButton from "../components/LoginButton";
 
-const Home: NextPage = () => {
+const Home = () => {
   return (
     <>
       <div className="text-3xl text-red-500 p-3">Hello!</div>
-      <Login />
+      <LoginButton />
     </>
   );
 };
