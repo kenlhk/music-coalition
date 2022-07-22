@@ -1,10 +1,23 @@
-import { Avatar, Button, Grid, Image, Link, Text } from "@nextui-org/react";
+import {
+  Avatar,
+  Col,
+  Grid,
+  Image,
+  Modal,
+  Row,
+  Text,
+  Tooltip
+} from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useState } from "react";
+import { TbBrandSpotify, TbPlayerPause, TbPlayerPlay } from "react-icons/tb";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
+import * as Tabs from "../../components/Tabs";
+import VideoCard from "../../components/VideoCard";
 import {
   serverAccessToken,
   spotifyApiWrapper,
@@ -22,7 +35,11 @@ interface trackProps {
 }
 
 const Track = (props: trackProps) => {
+  console.log(props.videos);
+
+  const [videoLink, setVideoLink] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const handlePlayPause = () => {
     setPlaying(!playing);
@@ -32,24 +49,60 @@ const Track = (props: trackProps) => {
     setPlaying(false);
   };
 
+  const handleVideoModalOpen = (videoLink: string) => {
+    setVideoLink(videoLink);
+    setVisible(true);
+  };
+
+  const handleVideoModalClose = () => {
+    setVideoLink("");
+    setPlaying(false);
+    setVisible(false);
+  };
+
   return (
     <div>
-      <Text h2>{props.track.name}</Text>
-      <Text h3>{props.artists.map((artist) => artist.name).join(", ")}</Text>
-      <Avatar.Group>
-        {props.artists.map((artist, index) => (
-          <Avatar
-            key={index}
-            css={{ size: "$20", zIndex: 0 }}
-            pointer
-            src={artist.images.length > 0 ? artist.images[2].url : ""}
-            text={artist.images.length == 0 ? artist.name : ""}
-            bordered
-            color="gradient"
-            stacked
-          />
-        ))}
-      </Avatar.Group>
+      <Row>
+        <Col>
+          <Text h2>{props.track.name}</Text>
+          <Text h3>
+            {props.artists.map((artist) => artist.name).join(", ")}
+          </Text>
+        </Col>
+        <Col>
+          <Avatar.Group css={{ float: "right" }}>
+            {props.artists.map((artist, index) => (
+              <Tooltip
+                key={index}
+                content={<Text>{artist.name}</Text>}
+                rounded
+                color="primary"
+                placement="bottomStart"
+              >
+                <Link
+                  href={{
+                    pathname: "/artist/[artistId]",
+                    query: {
+                      artistId: artist.id,
+                    },
+                  }}
+                >
+                  <Avatar
+                    css={{ size: "$20", zIndex: 0 }}
+                    pointer
+                    src={artist.images.length > 0 ? artist.images[2].url : ""}
+                    text={artist.images.length == 0 ? artist.name : ""}
+                    bordered
+                    color="gradient"
+                    stacked
+                  />
+                </Link>
+              </Tooltip>
+            ))}
+          </Avatar.Group>
+        </Col>
+      </Row>
+
       {props.album.images[1] ? (
         <Image
           src={props.album.images[1].url}
@@ -62,62 +115,97 @@ const Track = (props: trackProps) => {
       )}
       <br />
 
-      <Text h3>Preview:</Text>
-      {props.track.preview_url ? (
-        <div>
-          <ReactPlayer
-            key={"react-player"}
-            url={props.track.preview_url}
-            playing={playing}
-            width={0}
-            height={0}
-            onPause={handlePause}
-          />
-          <Button onPress={handlePlayPause} className="z-0">
-            {playing ? "Pause" : "Play"}
-          </Button>
-        </div>
-      ) : (
-        <p>No preview available.</p>
-      )}
-      <br />
-      <Text h3>Play full song on:</Text>
-      {props.track.external_urls.spotify && (
-        <div>
-          <Link href={props.track.external_urls.spotify} target="_blank">
-            Spotify
-          </Link>
-        </div>
-      )}
-
-      <br />
-      <br />
-      <Grid.Container gap={5}>
-        <Grid>
+      <Row>
+        <Col>
+          <Text h3>Preview:</Text>
+          {props.track.preview_url ? (
+            <div>
+              <ReactPlayer
+                key={"react-player"}
+                url={props.track.preview_url}
+                playing={playing}
+                width={0}
+                height={0}
+                onPause={handlePause}
+              />
+              <a onClick={handlePlayPause}>
+                {playing ? (
+                  <TbPlayerPause size={30} />
+                ) : (
+                  <TbPlayerPlay size={30} />
+                )}
+              </a>
+            </div>
+          ) : (
+            <p>No preview available.</p>
+          )}
+        </Col>
+        <Col>
+          <Text h3>Play full song on:</Text>
+          {props.track.external_urls.spotify && (
+            <div>
+              <Link href={props.track.external_urls.spotify} target="_blank">
+                <TbBrandSpotify size={40} color={"#1DB954"} />
+              </Link>
+            </div>
+          )}
+        </Col>
+      </Row>
+      <br/>
+      <Tabs.Tabs defaultValue="tab1">
+        <Tabs.TabsList>
+          <Tabs.TabsTrigger value="tab1">
+            <Text h3>Videos</Text>
+          </Tabs.TabsTrigger>
+          <Tabs.TabsTrigger value="tab2">
+            <Text h3>Lyrics</Text>
+          </Tabs.TabsTrigger>
+        </Tabs.TabsList>
+        <Tabs.TabsContent value="tab1">
           <Text h3>Related Videos:</Text>
+
           {props.videos ? (
-            props.videos
-              .filter((video, index) => index < 5)
-              .map((video, index) => (
-                <ReactPlayer
+            <Grid.Container gap={2} alignItems={"center"} justify={"center"}>
+              {props.videos.map((video, index) => (
+                <Grid
                   key={index}
-                  url={video.link}
-                  config={{ youtube: { playerVars: { controls: 1 } } }}
-                />
-              ))
+                  onClick={() => handleVideoModalOpen(video.link)}
+                >
+                  <VideoCard title={video.title} thumbnail={video.thumbnail} />
+                </Grid>
+              ))}
+            </Grid.Container>
           ) : (
             <p>No video found.</p>
           )}
-        </Grid>
-        <Grid>
+        </Tabs.TabsContent>
+        <Tabs.TabsContent value="tab2">
           <Text h3>Lyrics:</Text>
           {props.lyrics ? (
-            <span style={{ whiteSpace: "pre-line" }}>{props.lyrics}</span>
+            <Text style={{ whiteSpace: "pre-line" }}>{props.lyrics}</Text>
           ) : (
             <p>No lyrics found.</p>
           )}
-        </Grid>
-      </Grid.Container>
+        </Tabs.TabsContent>
+      </Tabs.Tabs>
+
+      <Modal
+        open={visible}
+        onClose={handleVideoModalClose}
+        blur
+        width="70%"
+        css={{ borderRadius: 20, alignItems: "center", height: "80vh" }}
+        closeButton
+      >
+        <Modal.Body style={{ width: "90%" }}>
+          <ReactPlayer
+            url={videoLink}
+            config={{ youtube: { playerVars: { controls: 1 } } }}
+            width="100%"
+            height="100%"
+          />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

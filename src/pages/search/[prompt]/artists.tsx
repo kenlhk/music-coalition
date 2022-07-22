@@ -65,7 +65,7 @@ const ArtistSearch = () => {
 
   const List = useMemo(
     () =>
-      React.forwardRef<HTMLDivElement>((props, ref) => {
+      React.forwardRef<HTMLDivElement>(function List (props, ref) {
         return (
           <Grid.Container {...props} ref={ref} gap={0.5} justify={"center"} />
         );

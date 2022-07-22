@@ -16,7 +16,7 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
     <div>
       <Row justify="space-between">
         <Text h3 css={{ alignSelf: "end" }}>
-          Search results for:{" "}
+          Results for:{" "}
           <Text color="primary" span>
             {prompt}
           </Text>{" "}

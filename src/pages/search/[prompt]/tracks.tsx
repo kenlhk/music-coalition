@@ -69,7 +69,7 @@ const TrackSearch = (props: searchTracksProps) => {
 
   const List = useMemo(
     () =>
-      React.forwardRef<HTMLDivElement>((props, ref) => {
+      React.forwardRef<HTMLDivElement>(function List(props, ref) {
         return (
           <Grid.Container {...props} ref={ref} gap={0.5} justify={"center"} />
         );
@@ -80,7 +80,7 @@ const TrackSearch = (props: searchTracksProps) => {
   return (
     <div>
       <VirtuosoGrid
-        style={{ height: "77vh", width: "$", overflowX: "hidden" }}
+        style={{ height: "77vh", overflowX: "hidden" }}
         totalCount={tracks.length}
         endReached={() => {
           fetchNextPage();
@@ -144,6 +144,6 @@ TrackSearch.getLayout = function getLayout(page: ReactNode) {
 //       initialTracks: res.body.tracks,
 //     },
 //   };
-// };
+// }
 
 export default TrackSearch;
