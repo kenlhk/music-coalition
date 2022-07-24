@@ -1,5 +1,5 @@
 import { Grid } from "@nextui-org/react";
-import axios from "axios";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
@@ -8,17 +8,23 @@ import { VirtuosoGrid } from "react-virtuoso";
 import ArtistCard from "../../../components/ArtistCard";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
-import { spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
+import { getServerAccessToken, spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
 
-const ArtistSearch = () => {
+interface searchArtistsProps {
+  accessToken: string;
+  initialTracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>;
+}
+
+const ArtistSearch = (props: searchArtistsProps) => {
   const router = useRouter();
   const prompt = router.query.prompt;
   const [artists, setArtists] = useState<SpotifyApi.ArtistObjectFull[]>([]);
+  const accessToken = props.accessToken;
 
   const fetcher = async ({ pageParam = "" }) => {
-    const {
-      data: { accessToken },
-    } = await axios.get("/api/auth/token");
+    // const {
+    //   data: { accessToken },
+    // } = await axios.get("/api/auth/token");
     spotifyApiWrapper.setAccessToken(accessToken);
 
     if (pageParam !== "") {
@@ -116,6 +122,16 @@ const ArtistSearch = () => {
 
 ArtistSearch.getLayout = function getLayout(page: ReactNode) {
   return <SearchLayout>{page}</SearchLayout>;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const accessToken = await getServerAccessToken();
+
+  return {
+    props: {
+      accessToken: accessToken,
+    },
+  };
 };
 
 export default ArtistSearch;

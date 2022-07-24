@@ -1,5 +1,5 @@
 import { Grid } from "@nextui-org/react";
-import axios from "axios";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
@@ -8,10 +8,14 @@ import { VirtuosoGrid } from "react-virtuoso";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
 import TrackCard from "../../../components/TrackCard";
-import { spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
+import {
+  getServerAccessToken,
+  spotifyApiWrapper,
+  spotifyAxiosClient,
+} from "../../../lib/spotify";
 
 interface searchTracksProps {
-  serverAccessToken: string;
+  accessToken: string;
   initialTracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>;
 }
 
@@ -19,11 +23,9 @@ const TrackSearch = (props: searchTracksProps) => {
   const router = useRouter();
   const prompt = router.query.prompt;
   const [tracks, setTracks] = useState<SpotifyApi.TrackObjectFull[]>([]);
+  const accessToken = props.accessToken;
 
   const fetcher = async ({ pageParam = "" }) => {
-    const {
-      data: { accessToken },
-    } = await axios.get("/api/auth/token");
     spotifyApiWrapper.setAccessToken(accessToken);
 
     if (pageParam !== "") {
@@ -125,25 +127,14 @@ TrackSearch.getLayout = function getLayout(page: ReactNode) {
   return <SearchLayout>{page}</SearchLayout>;
 };
 
-// TODO: SSR initial tracks
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const session = await unstable_getServerSession(
-//     context.req,
-//     context.res,
-//     authOptions
-//   );
-//   const accessToken = session?.accessToken as string;
-//   spotifyWebApi.setAccessToken(accessToken);
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const accessToken = await getServerAccessToken();
 
-//   const res = await spotifyWebApi.search(context.query.query as string, [
-//     "track",
-//   ]);
-
-//   return {
-//     props: {
-//       initialTracks: res.body.tracks,
-//     },
-//   };
-// }
+  return {
+    props: {
+      accessToken: accessToken,
+    },
+  };
+};
 
 export default TrackSearch;

@@ -6,7 +6,7 @@ import {
   Modal,
   Row,
   Text,
-  Tooltip,
+  Tooltip
 } from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
@@ -19,9 +19,9 @@ import Youtube from "scrape-youtube/lib/interface";
 import * as Tabs from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import {
-  serverAccessToken,
+  getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../lib/spotify";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -209,7 +209,7 @@ const Track = (props: trackProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await serverAccessToken;
+  const accessToken = await getServerAccessToken();
 
   spotifyApiWrapper.setAccessToken(accessToken);
 
