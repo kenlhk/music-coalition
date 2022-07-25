@@ -13,7 +13,7 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
   const CATEGORIES = ["tracks", "artists", "albums"];
 
   return (
-    <div>
+    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90">
       <Row justify="space-between">
         <Text h3 css={{ alignSelf: "end" }}>
           Results for:{" "}
@@ -38,7 +38,7 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
       </Row>
 
       <div>{children}</div>
-    </div>
+    </nav>
   );
 };
 

@@ -1,6 +1,5 @@
 import { Grid } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
@@ -8,7 +7,11 @@ import { VirtuosoGrid } from "react-virtuoso";
 import ArtistCard from "../../../components/ArtistCard";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
-import { getServerAccessToken, spotifyApiWrapper, spotifyAxiosClient } from "../../../lib/spotify";
+import {
+  getServerAccessToken,
+  spotifyApiWrapper,
+  spotifyAxiosClient
+} from "../../../lib/spotify";
 
 interface searchArtistsProps {
   accessToken: string;
@@ -22,9 +25,6 @@ const ArtistSearch = (props: searchArtistsProps) => {
   const accessToken = props.accessToken;
 
   const fetcher = async ({ pageParam = "" }) => {
-    // const {
-    //   data: { accessToken },
-    // } = await axios.get("/api/auth/token");
     spotifyApiWrapper.setAccessToken(accessToken);
 
     if (pageParam !== "") {
@@ -71,7 +71,7 @@ const ArtistSearch = (props: searchArtistsProps) => {
 
   const List = useMemo(
     () =>
-      React.forwardRef<HTMLDivElement>(function List (props, ref) {
+      React.forwardRef<HTMLDivElement>(function List(props, ref) {
         return (
           <Grid.Container {...props} ref={ref} gap={0.5} justify={"center"} />
         );
@@ -82,7 +82,7 @@ const ArtistSearch = (props: searchArtistsProps) => {
   return (
     <div>
       <VirtuosoGrid
-        style={{ height: "77vh", overflowX: "hidden" }}
+        style={{ height: "78vh", overflowX: "hidden" }}
         totalCount={artists.length}
         endReached={() => {
           fetchNextPage();
@@ -94,22 +94,11 @@ const ArtistSearch = (props: searchArtistsProps) => {
         itemContent={(index) => (
           <div>
             <Grid>
-              <Link
-                href={{
-                  pathname: "/artist/[artistId]",
-                  query: {
-                    artistId: artists[index].id,
-                  },
-                }}
-              >
-                <a>
-                  <ArtistCard
-                    key={index.toString()}
-                    name={artists[index].name}
-                    image={artists[index].images[1]?.url}
-                  />
-                </a>
-              </Link>
+              <ArtistCard
+                id={artists[index].id.toString()}
+                name={artists[index].name}
+                image={artists[index].images[1]?.url}
+              />
             </Grid>
           </div>
         )}

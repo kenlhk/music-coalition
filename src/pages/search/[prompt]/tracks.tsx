@@ -1,6 +1,5 @@
 import { Grid } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
@@ -11,7 +10,7 @@ import TrackCard from "../../../components/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../../lib/spotify";
 
 interface searchTracksProps {
@@ -82,7 +81,7 @@ const TrackSearch = (props: searchTracksProps) => {
   return (
     <div>
       <VirtuosoGrid
-        style={{ height: "77vh", overflowX: "hidden" }}
+        style={{ height: "78vh", overflowX: "hidden" }}
         totalCount={tracks.length}
         endReached={() => {
           fetchNextPage();
@@ -94,25 +93,14 @@ const TrackSearch = (props: searchTracksProps) => {
         itemContent={(index) => (
           <div>
             <Grid>
-              <Link
-                href={{
-                  pathname: "/track/[trackId]",
-                  query: {
-                    trackId: tracks[index].id,
-                  },
-                }}
-              >
-                <a>
-                  <TrackCard
-                    key={index.toString()}
-                    name={tracks[index].name}
-                    artistNames={tracks[index].artists.map(
-                      (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
-                    )}
-                    cover={tracks[index].album?.images[1]?.url}
-                  />
-                </a>
-              </Link>
+              <TrackCard
+                id={tracks[index].id.toString()}
+                name={tracks[index].name}
+                artistNames={tracks[index].artists.map(
+                  (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
+                )}
+                cover={tracks[index].album?.images[1]?.url}
+              />
             </Grid>
           </div>
         )}

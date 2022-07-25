@@ -29,9 +29,9 @@ const StyledTrigger = styled(TabsPrimitive.Trigger, {
   "&:first-child": { borderTopLeftRadius: 20 },
   "&:last-child": { borderTopRightRadius: 20 },
   "&:hover": { color: "Violet" },
-  '&[data-state="active"]': {
+  "&[data-state='active']": {
     color: "#0072F5",
-    boxShadow: "inset 0 -1px 0 0 currentColor, 0 1px 0 0 currentColor",
+    border: "solid 2px white",
   },
 });
 
@@ -39,8 +39,8 @@ const StyledContent = styled(TabsPrimitive.Content, {
   flexGrow: 1,
   padding: 20,
   backgroundColor: "#16181A",
-  borderBottomLeftRadius: 6,
-  borderBottomRightRadius: 6,
+  borderBottomLeftRadius: 20,
+  borderBottomRightRadius: 20,
   outline: "none",
 });
 

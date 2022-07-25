@@ -2,7 +2,6 @@ import {
   Avatar,
   Col,
   Grid,
-  Image,
   Modal,
   Row,
   Text,
@@ -11,12 +10,16 @@ import {
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { TbBrandSpotify, TbPlayerPause, TbPlayerPlay } from "react-icons/tb";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
-import * as Tabs from "../../components/Tabs";
+import {
+  Tabs, TabsContent, TabsList,
+  TabsTrigger
+} from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
@@ -26,7 +29,7 @@ import {
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
-interface trackProps {
+interface TrackPageProps {
   track: SpotifyApi.TrackObjectFull;
   artists: SpotifyApi.ArtistObjectFull[];
   album: SpotifyApi.AlbumObjectFull;
@@ -34,7 +37,7 @@ interface trackProps {
   lyrics?: string;
 }
 
-const Track = (props: trackProps) => {
+const Track = (props: TrackPageProps) => {
   const [videoLink, setVideoLink] = useState("");
   const [playing, setPlaying] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -60,14 +63,16 @@ const Track = (props: trackProps) => {
 
   return (
     <div>
-      <Row>
-        <Col>
-          <Text h2>{props.track.name}</Text>
-          <Text h3>
-            {props.artists.map((artist) => artist.name).join(", ")}
-          </Text>
-        </Col>
-        <Col>
+      <Grid.Container alignContent="space-between">
+        <Grid md={6}>
+          <Col>
+            <Text h2>{props.track.name}</Text>
+            <Text h3>
+              {props.artists.map((artist) => artist.name).join(", ")}
+            </Text>
+          </Col>
+        </Grid>
+        <Grid md={6} justify="flex-end">
           <Avatar.Group css={{ float: "right" }}>
             {props.artists.map((artist, index) => (
               <Tooltip
@@ -98,19 +103,15 @@ const Track = (props: trackProps) => {
               </Tooltip>
             ))}
           </Avatar.Group>
-        </Col>
+        </Grid>
+      </Grid.Container>
+      <Row justify="center">
+        {props.album.images[1] ? (
+          <Image src={props.album.images[0].url} height={400} width={400} />
+        ) : (
+          <p>No Album Cover</p>
+        )}
       </Row>
-
-      {props.album.images[1] ? (
-        <Image
-          src={props.album.images[1].url}
-          width={300}
-          height={300}
-          autoResize={true}
-        />
-      ) : (
-        <p>No Album Cover</p>
-      )}
       <br />
 
       <Row>
@@ -150,18 +151,18 @@ const Track = (props: trackProps) => {
         </Col>
       </Row>
       <br />
-      <Tabs.Tabs defaultValue="tab1">
-        <Tabs.TabsList>
-          <Tabs.TabsTrigger value="tab1">
-            <Text h3>Videos</Text>
-          </Tabs.TabsTrigger>
-          <Tabs.TabsTrigger value="tab2">
-            <Text h3>Lyrics</Text>
-          </Tabs.TabsTrigger>
-        </Tabs.TabsList>
-        <Tabs.TabsContent value="tab1">
-          <Text h3>Related Videos:</Text>
 
+      <Tabs defaultValue="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">
+            <Text h3>Videos</Text>
+          </TabsTrigger>
+          <TabsTrigger value="tab2">
+            <Text h3>Lyrics</Text>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">
+          <Text h3>Related Videos:</Text>
           {props.videos ? (
             <Grid.Container gap={2} alignItems={"center"} justify={"center"}>
               {props.videos.map((video, index) => (
@@ -176,16 +177,16 @@ const Track = (props: trackProps) => {
           ) : (
             <p>No video found.</p>
           )}
-        </Tabs.TabsContent>
-        <Tabs.TabsContent value="tab2">
+        </TabsContent>
+        <TabsContent value="tab2">
           <Text h3>Lyrics:</Text>
           {props.lyrics ? (
             <Text style={{ whiteSpace: "pre-line" }}>{props.lyrics}</Text>
           ) : (
             <p>No lyrics found.</p>
           )}
-        </Tabs.TabsContent>
-      </Tabs.Tabs>
+        </TabsContent>
+      </Tabs>
 
       <Modal
         open={visible}
