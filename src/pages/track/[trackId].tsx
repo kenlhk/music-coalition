@@ -4,6 +4,7 @@ import {
   Grid,
   Modal,
   Row,
+  Spacer,
   Text,
   Tooltip
 } from "@nextui-org/react";
@@ -12,12 +13,20 @@ import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
+import { ItunesSearchOptions, searchItunes } from "node-itunes-search";
 import { useState } from "react";
-import { TbBrandSpotify, TbPlayerPause, TbPlayerPlay } from "react-icons/tb";
+import {
+  TbBrandApple,
+  TbBrandSpotify,
+  TbPlayerPause,
+  TbPlayerPlay
+} from "react-icons/tb";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
 import {
-  Tabs, TabsContent, TabsList,
+  Tabs,
+  TabsContent,
+  TabsList,
   TabsTrigger
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
@@ -35,6 +44,7 @@ interface TrackPageProps {
   album: SpotifyApi.AlbumObjectFull;
   videos?: Youtube.Video[];
   lyrics?: string;
+  itunesURL?: string;
 }
 
 const Track = (props: TrackPageProps) => {
@@ -64,7 +74,7 @@ const Track = (props: TrackPageProps) => {
   return (
     <div>
       <Grid.Container alignContent="space-between">
-        <Grid md={6}>
+        <Grid md={4}>
           <Col>
             <Text h2>{props.track.name}</Text>
             <Text h3>
@@ -72,7 +82,7 @@ const Track = (props: TrackPageProps) => {
             </Text>
           </Col>
         </Grid>
-        <Grid md={6} justify="flex-end">
+        <Grid md={8} justify="flex-end">
           <Avatar.Group css={{ float: "right" }}>
             {props.artists.map((artist, index) => (
               <Tooltip
@@ -105,6 +115,7 @@ const Track = (props: TrackPageProps) => {
           </Avatar.Group>
         </Grid>
       </Grid.Container>
+
       <Row justify="center">
         {props.album.images[1] ? (
           <Image src={props.album.images[0].url} height={400} width={400} />
@@ -141,17 +152,27 @@ const Track = (props: TrackPageProps) => {
         </Col>
         <Col>
           <Text h3>Play full song on:</Text>
-          {props.track.external_urls.spotify && (
-            <div>
+          <Row>
+            {props.track.external_urls.spotify && (
               <Link href={props.track.external_urls.spotify} target="_blank">
-                <TbBrandSpotify size={40} color={"#1DB954"} />
+                <a>
+                  <TbBrandSpotify size={50} color={"#1DB954"} />
+                </a>
               </Link>
-            </div>
-          )}
+            )}
+            <Spacer />
+            {props.itunesURL && (
+              <Link href={props.itunesURL} target="_blank">
+                <a>
+                  <TbBrandApple size={50} color={"#555555"} />
+                </a>
+              </Link>
+            )}
+          </Row>
         </Col>
       </Row>
-      <br />
 
+      <Spacer />
       <Tabs defaultValue="tab1">
         <TabsList>
           <TabsTrigger value="tab1">
@@ -231,6 +252,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const artistsQueryString = artists.map((artist) => artist.name).join(" ");
 
+  // Fetch the track in iTunes
+  const searchOptions = new ItunesSearchOptions({
+    term: `${encodeURIComponent(track.name)} ${encodeURIComponent(
+      artistsQueryString
+    )}`,
+    limit: 1,
+  });
+  
+  const itunesURL = await searchItunes(searchOptions).then(
+    (res) => res.results[0].trackViewUrl || ""
+  );
+
   // Fetch videos from YouTube
   const { videos } = await youtube.search(
     `${track.name} ${artistsQueryString}`
@@ -256,6 +289,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       album: track.album,
       videos: videos || null,
       lyrics: lyrics || null,
+      itunesURL: itunesURL,
     },
   };
 };
