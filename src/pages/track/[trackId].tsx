@@ -1,6 +1,7 @@
 import {
   Avatar,
   Col,
+  Container,
   Grid,
   Modal,
   Row,
@@ -61,6 +62,7 @@ const Track = (props: TrackPageProps) => {
   };
 
   const handleVideoModalOpen = (videoLink: string) => {
+    setPlaying(false);
     setVideoLink(videoLink);
     setVisible(true);
   };
@@ -73,7 +75,7 @@ const Track = (props: TrackPageProps) => {
 
   return (
     <div>
-      <Grid.Container alignContent="space-between">
+      <Grid.Container justify="space-around" css={{ width: "100%" }}>
         <Grid md={4}>
           <Col>
             <Text h2>{props.track.name}</Text>
@@ -116,61 +118,60 @@ const Track = (props: TrackPageProps) => {
         </Grid>
       </Grid.Container>
 
-      <Row justify="center">
-        {props.album.images[1] ? (
-          <Image src={props.album.images[0].url} height={400} width={400} />
-        ) : (
-          <p>No Album Cover</p>
-        )}
-      </Row>
-      <br />
-
-      <Row>
-        <Col>
-          <Text h3>Preview:</Text>
-          {props.track.preview_url ? (
-            <div>
-              <ReactPlayer
-                key={"react-player"}
-                url={props.track.preview_url}
-                playing={playing}
-                width={0}
-                height={0}
-                onPause={handlePause}
-              />
-              <a onClick={handlePlayPause}>
-                {playing ? (
-                  <TbPlayerPause size={30} />
-                ) : (
-                  <TbPlayerPlay size={30} />
-                )}
-              </a>
-            </div>
+      <Container className="m-5">
+        <Row justify="center">
+          {props.album.images[1] ? (
+            <Image src={props.album.images[0].url} height={400} width={400} />
           ) : (
-            <p>No preview available.</p>
+            <p>No Album Cover</p>
           )}
-        </Col>
-        <Col>
-          <Text h3>Play full song on:</Text>
-          <Row>
-            {props.track.external_urls.spotify && (
-              <Link href={props.track.external_urls.spotify} target="_blank">
-                <a>
+        </Row>
+      </Container>
+
+      <Container>
+        <Row>
+          <Col>
+            <Text h3>Preview:</Text>
+            {props.track.preview_url ? (
+              <div>
+                <ReactPlayer
+                  key={"react-player"}
+                  url={props.track.preview_url}
+                  playing={playing}
+                  width={0}
+                  height={0}
+                  onPause={handlePause}
+                />
+                <a onClick={handlePlayPause}>
+                  {playing ? (
+                    <TbPlayerPause size={30} />
+                  ) : (
+                    <TbPlayerPlay size={30} />
+                  )}
+                </a>
+              </div>
+            ) : (
+              <p>No preview available.</p>
+            )}
+          </Col>
+          <Col>
+            <Text h3>Play full song on:</Text>
+            <Row>
+              {props.track.external_urls.spotify && (
+                <a href={props.track.external_urls.spotify} target="_blank" rel="noopener noreferrer">
                   <TbBrandSpotify size={50} color={"#1DB954"} />
                 </a>
-              </Link>
-            )}
-            <Spacer />
-            {props.itunesURL && (
-              <Link href={props.itunesURL} target="_blank">
-                <a>
+              )}
+              <Spacer />
+              {props.itunesURL && (
+                <a href={props.itunesURL} target="_blank" rel="noopener noreferrer">
                   <TbBrandApple size={50} color={"#555555"} />
                 </a>
-              </Link>
-            )}
-          </Row>
-        </Col>
-      </Row>
+              )}
+            </Row>
+          </Col>
+        </Row>
+      </Container>
 
       <Spacer />
       <Tabs defaultValue="tab1">
@@ -259,9 +260,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     )}`,
     limit: 1,
   });
-  
-  const itunesURL = await searchItunes(searchOptions).then(
-    (res) => res.results[0].trackViewUrl || ""
+
+  const itunesURL = await searchItunes(searchOptions).then((res) =>
+    res.resultCount > 0 ? res.results[0].trackViewUrl : ""
   );
 
   // Fetch videos from YouTube

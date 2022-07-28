@@ -4,24 +4,23 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
+import AlbumCard from "../../../components/AlbumCard";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
-import TrackCard from "../../../components/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
   spotifyAxiosClient
 } from "../../../lib/spotify";
 
-interface SearchTracksProps {
+interface SearchAlbumProps {
   accessToken: string;
-  initialTracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>;
 }
 
-const TrackSearch = (props: SearchTracksProps) => {
+const AlbumSearch = (props: SearchAlbumProps) => {
   const router = useRouter();
   const prompt = router.query.prompt;
-  const [tracks, setTracks] = useState<SpotifyApi.TrackObjectFull[]>([]);
+  const [albums, setAlbums] = useState<SpotifyApi.AlbumObjectFull[]>([]);
   const accessToken = props.accessToken;
 
   const fetcher = async ({ pageParam = "" }) => {
@@ -34,19 +33,19 @@ const TrackSearch = (props: SearchTracksProps) => {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-        .then((res) => res.data.tracks);
+        .then((res) => res.data.albums);
       return res;
     }
 
     const res = await spotifyApiWrapper
-      .search(prompt as string, ["track"], { limit: 30 })
-      .then((res) => res.body.tracks);
+      .search(prompt as string, ["album"], { limit: 30 })
+      .then((res) => res.body.albums);
 
     return res;
   };
 
-  const { fetchNextPage, hasNextPage, error } = useInfiniteQuery(
-    "tracks",
+  const { isFetching, fetchNextPage, hasNextPage, error } = useInfiniteQuery(
+    "albums",
     fetcher,
     {
       getNextPageParam: (lastPage) => {
@@ -56,17 +55,13 @@ const TrackSearch = (props: SearchTracksProps) => {
       cacheTime: 0,
       staleTime: 0,
       onSuccess: (data) =>
-        updateTracks(data?.pages.flatMap((page) => page.items)),
+        updateAlbums(data?.pages.flatMap((page) => page.items)),
     }
   );
 
-  const updateTracks = (items: SpotifyApi.TrackObjectFull[]) => {
-    setTracks(items);
+  const updateAlbums = (items: SpotifyApi.AlbumObjectFull[]) => {
+    setAlbums(items);
   };
-
-  if (error) {
-    console.log(error);
-  }
 
   const List = useMemo(
     () =>
@@ -82,7 +77,7 @@ const TrackSearch = (props: SearchTracksProps) => {
     <div>
       <VirtuosoGrid
         style={{ height: "78vh", overflowX: "hidden" }}
-        totalCount={tracks.length}
+        totalCount={albums.length}
         endReached={() => {
           fetchNextPage();
         }}
@@ -93,13 +88,13 @@ const TrackSearch = (props: SearchTracksProps) => {
         itemContent={(index) => (
           <div>
             <Grid>
-              <TrackCard
-                id={tracks[index].id.toString()}
-                name={tracks[index].name}
-                artistNames={tracks[index].artists.map(
+              <AlbumCard
+                id={albums[index].id.toString()}
+                name={albums[index].name}
+                artistNames={albums[index].artists.map(
                   (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
                 )}
-                cover={tracks[index].album?.images[1]?.url}
+                cover={albums[index].images[1]?.url}
               />
             </Grid>
           </div>
@@ -111,7 +106,7 @@ const TrackSearch = (props: SearchTracksProps) => {
   );
 };
 
-TrackSearch.getLayout = function getLayout(page: ReactNode) {
+AlbumSearch.getLayout = function getLayout(page: ReactNode) {
   return <SearchLayout>{page}</SearchLayout>;
 };
 
@@ -125,4 +120,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default TrackSearch;
+export default AlbumSearch;

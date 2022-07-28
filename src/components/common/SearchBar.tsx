@@ -1,8 +1,20 @@
 import { FormElement, Input } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { ChangeEvent, useState, KeyboardEvent } from "react";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { TbSearch } from "react-icons/tb";
 
-const SearchBar = () => {
+interface SearchBarProps {
+  status?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error"
+    | undefined;
+}
+
+const SearchBar = (props: SearchBarProps) => {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
@@ -30,8 +42,11 @@ const SearchBar = () => {
       width="100%"
       onKeyDown={onKeyDown}
       onChange={onChange}
-      labelPlaceholder="Search"
+      placeholder="Search"
       animated={false}
+      status={props.status || "default"}
+      labelLeft={<TbSearch size={20} color={"#555555"} />}
+      aria-label="Search"
     />
   );
 };

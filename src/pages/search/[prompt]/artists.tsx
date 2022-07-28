@@ -13,12 +13,12 @@ import {
   spotifyAxiosClient
 } from "../../../lib/spotify";
 
-interface searchArtistsProps {
+interface SearchArtistsProps {
   accessToken: string;
   initialTracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>;
 }
 
-const ArtistSearch = (props: searchArtistsProps) => {
+const ArtistSearch = (props: SearchArtistsProps) => {
   const router = useRouter();
   const prompt = router.query.prompt;
   const [artists, setArtists] = useState<SpotifyApi.ArtistObjectFull[]>([]);
@@ -78,6 +78,7 @@ const ArtistSearch = (props: searchArtistsProps) => {
       }),
     []
   );
+  
 
   return (
     <div>
@@ -115,7 +116,7 @@ ArtistSearch.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const accessToken = await getServerAccessToken();
-
+  
   return {
     props: {
       accessToken: accessToken,

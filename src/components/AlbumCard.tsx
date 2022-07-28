@@ -1,19 +1,22 @@
 import { Card, Col, Row, Text } from "@nextui-org/react";
 import Link from "next/link";
 
-interface ArtistCardProps {
+interface AlbumCardProps {
   id: string;
   name: string;
-  image?: string;
+  artistNames: string[];
+  cover?: string;
 }
 
-const ArtistCard = (props: ArtistCardProps) => {
+const AlbumCard = (props: AlbumCardProps) => {
+  const artists = props.artistNames.join(", ");
+
   return (
     <Link
       href={{
-        pathname: "/artist/[artistId]",
+        pathname: "/album/[albumId]",
         query: {
-          artistId: props.id,
+          albumId: props.id,
         },
       }}
     >
@@ -21,12 +24,9 @@ const ArtistCard = (props: ArtistCardProps) => {
         <Card css={{ border: "none" }} isPressable>
           <Card.Body css={{ p: 0 }}>
             <Card.Image
-              src={
-                props.image ||
-                "/Avatar_Placeholder.png"
-              }
+              src={props.cover || ""}
               objectFit="cover"
-              alt="Artist image"
+              alt="Album cover"
               height={"180px"}
               width={"180px"}
             />
@@ -45,8 +45,11 @@ const ArtistCard = (props: ArtistCardProps) => {
           >
             <Row>
               <Col>
-                <Text className="font-bold truncate" color="#FFF" size={"100%"}>
+                <Text className="font-bold truncate" color="#FFF" size={"80%"}>
                   {props.name}
+                </Text>
+                <Text className="truncate" color="#FFF" size={"70%"}>
+                  {artists}
                 </Text>
               </Col>
             </Row>
@@ -57,4 +60,4 @@ const ArtistCard = (props: ArtistCardProps) => {
   );
 };
 
-export default ArtistCard;
+export default AlbumCard;
