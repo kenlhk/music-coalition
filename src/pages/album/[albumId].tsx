@@ -11,7 +11,6 @@ interface AlbumPageProps {
 }
 
 const Album = (props: AlbumPageProps) => {
-
   const [tracks, setTracks] = useState(props.album.tracks.items);
 
   return (
@@ -24,7 +23,6 @@ const Album = (props: AlbumPageProps) => {
       <TableVirtuoso
         style={{ height: 400 }}
         data={tracks}
-       
         itemContent={(index, track) => (
           <>
             <td style={{ width: 150 }}>{track.name}</td>

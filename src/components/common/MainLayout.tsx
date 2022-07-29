@@ -1,9 +1,10 @@
-import { Progress, Text, User } from "@nextui-org/react";
+import { Progress, Spacer, Text, User } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Router } from "next/router";
 import { ReactNode } from "react";
+import { TbBrandGithub } from "react-icons/tb";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
 import useLoadingStore from "../../stores/useLoadingStore";
 import BurgerMenu from "./BurgerMenu";
@@ -45,9 +46,9 @@ const NavBar = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90">
+    <nav className="sticky top-0 z-50 w-full bg-opacity-90 pb-1">
       <div className="flex flex-col">
-        <div className="w-full">
+        <div className="w-full mb-0.5">
           {isLoading ? (
             <Progress
               indeterminated
@@ -88,7 +89,7 @@ const NavBar = () => {
             </BurgerMenu>
           </div>
           <div className="hidden md:inline-block w-1/3">
-            <SearchBar />
+            <SearchBar bordered />
           </div>
           <div className="flex justify-end w-1/2 md:w-1/3">
             <User
@@ -103,11 +104,29 @@ const NavBar = () => {
   );
 };
 
+const Footer = () => {
+  return (
+    <div className="absolute bottom-0 w-full p-1 z-50 flex justify-center bg-black bg-opacity-90">
+      <Text>Developed by Ken</Text>
+      <Spacer x={0.5} />
+      <a
+        href={"https://github.com/kenlhk/music-coalition"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-inherit"
+      >
+        <TbBrandGithub size={30} />
+      </a>
+    </div>
+  );
+};
+
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div>
+    <div className="min-h-screen min-w-screen">
       <NavBar />
       <div className="py-5 px-2">{children}</div>
+      <Footer />
     </div>
   );
 };

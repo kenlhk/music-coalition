@@ -10,7 +10,7 @@ import MoreButton from "../../../components/MoreButton";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../../lib/spotify";
 
 interface SearchArtistsProps {
@@ -78,7 +78,6 @@ const ArtistSearch = (props: SearchArtistsProps) => {
       }),
     []
   );
-  
 
   return (
     <div>
@@ -116,7 +115,7 @@ ArtistSearch.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const accessToken = await getServerAccessToken();
-  
+
   return {
     props: {
       accessToken: accessToken,

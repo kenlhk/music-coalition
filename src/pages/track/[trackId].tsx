@@ -7,7 +7,7 @@ import {
   Row,
   Spacer,
   Text,
-  Tooltip
+  Tooltip,
 } from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
@@ -20,7 +20,7 @@ import {
   TbBrandApple,
   TbBrandSpotify,
   TbPlayerPause,
-  TbPlayerPlay
+  TbPlayerPlay,
 } from "react-icons/tb";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
@@ -28,13 +28,13 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../lib/spotify";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -158,13 +158,21 @@ const Track = (props: TrackPageProps) => {
             <Text h3>Play full song on:</Text>
             <Row>
               {props.track.external_urls.spotify && (
-                <a href={props.track.external_urls.spotify} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={props.track.external_urls.spotify}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <TbBrandSpotify size={50} color={"#1DB954"} />
                 </a>
               )}
               <Spacer />
               {props.itunesURL && (
-                <a href={props.itunesURL} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={props.itunesURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <TbBrandApple size={50} color={"#555555"} />
                 </a>
               )}

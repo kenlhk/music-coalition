@@ -4,4 +4,4 @@ const myDarkTheme = createTheme({
   type: "dark",
 });
 
-export {myDarkTheme};
+export { myDarkTheme };

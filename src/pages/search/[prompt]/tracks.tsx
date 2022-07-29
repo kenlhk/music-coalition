@@ -10,7 +10,7 @@ import TrackCard from "../../../components/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../../lib/spotify";
 
 interface SearchTracksProps {

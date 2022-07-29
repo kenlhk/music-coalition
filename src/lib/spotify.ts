@@ -48,4 +48,3 @@ const getServerAccessToken = async () => {
 //   .catch((err) => console.log(err));
 
 export { spotifyAxiosClient, spotifyApiWrapper, getServerAccessToken };
-

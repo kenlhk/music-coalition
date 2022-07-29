@@ -10,7 +10,7 @@ import MoreButton from "../../../components/MoreButton";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../../lib/spotify";
 
 interface SearchAlbumProps {

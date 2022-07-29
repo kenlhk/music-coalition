@@ -12,6 +12,7 @@ interface SearchBarProps {
     | "warning"
     | "error"
     | undefined;
+  bordered?: boolean;
 }
 
 const SearchBar = (props: SearchBarProps) => {
@@ -47,6 +48,7 @@ const SearchBar = (props: SearchBarProps) => {
       status={props.status || "default"}
       labelLeft={<TbSearch size={20} color={"#555555"} />}
       aria-label="Search"
+      bordered={props.bordered}
     />
   );
 };
