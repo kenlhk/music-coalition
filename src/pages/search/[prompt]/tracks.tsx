@@ -106,7 +106,7 @@ const TrackSearch = (props: SearchTracksProps) => {
         )}
       />
 
-      {hasNextPage && <MoreButton />}
+      {/* {hasNextPage && <MoreButton />} */}
     </div>
   );
 };

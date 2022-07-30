@@ -1,6 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
 import SpotifyProvider from "next-auth/providers/spotify";
+import clientPromise from "../../../lib/mongodb";
 import { spotifyApiWrapper } from "../../../lib/spotify";
 
 const refreshAccessToken = async (token: JWT) => {
@@ -29,10 +31,39 @@ const refreshAccessToken = async (token: JWT) => {
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    CredentialsProvider({
+      credentials: {
+        email: { type: "email" },
+        password: { type: "password" },
+      },
+      async authorize(credentials, req) {
+        try {
+          const client = await clientPromise;
+          const user = await client.db().collection("users").findOne({
+            email: credentials?.email,
+          });
+
+          if (!user) throw new Error("No user found");
+
+          // const isPasswordValid = await verifyPassword(
+          //   credentials?.password,
+          //   user.password
+          // );
+
+          // if (!isPasswordValid) throw new Error("Password is not valid");
+
+          return {
+            email: user.email,
+          };
+        } catch (error) {
+          throw new Error(error as string);
+        }
+      },
     }),
+    // SpotifyProvider({
+    //   clientId: process.env.SPOTIFY_CLIENT_ID,
+    //   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    // }),
   ],
 
   secret: process.env.NEXTAUTH_SECRET,
@@ -65,6 +96,10 @@ export const authOptions: NextAuthOptions = {
 
       return session;
     },
+  },
+
+  session: {
+    strategy: "jwt",
   },
 };
 

@@ -14,4 +14,8 @@ declare module "next-auth" {
     refreshToken: string;
     accessTokenExpires: number;
   }
+
+  interface User {
+    password?: string;
+  }
 }

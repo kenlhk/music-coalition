@@ -46,7 +46,7 @@ const NavBar = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-opacity-90 pb-1">
+    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 pb-1">
       <div className="flex flex-col">
         <div className="w-full mb-0.5">
           {isLoading ? (
@@ -106,7 +106,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="absolute bottom-0 w-full p-1 z-50 flex justify-center bg-black bg-opacity-90">
+    <div className="absolute bottom-0 w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
@@ -123,9 +123,9 @@ const Footer = () => {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div className="min-h-screen min-w-screen">
+    <div className="flex flex-col justify-between min-h-screen min-w-screen">
       <NavBar />
-      <div className="py-5 px-2">{children}</div>
+      <div className="flex-grow">{children}</div>
       <Footer />
     </div>
   );

@@ -101,7 +101,7 @@ const AlbumSearch = (props: SearchAlbumProps) => {
         )}
       />
 
-      {hasNextPage && <MoreButton />}
+      {/* {hasNextPage && <MoreButton />} */}
     </div>
   );
 };

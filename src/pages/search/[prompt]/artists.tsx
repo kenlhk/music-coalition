@@ -104,7 +104,7 @@ const ArtistSearch = (props: SearchArtistsProps) => {
         )}
       />
 
-      {hasNextPage && <MoreButton />}
+      {/* {hasNextPage && <MoreButton />} */}
     </div>
   );
 };
