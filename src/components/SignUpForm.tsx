@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input as StaticInput, Text } from "@nextui-org/react";
+import { signIn } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -29,6 +31,8 @@ const schema = z
   .required();
 
 const SignUpForm = () => {
+  const router = useRouter();
+
   const {
     handleSubmit,
     control,
@@ -67,7 +71,11 @@ const SignUpForm = () => {
       const data = await res.json();
 
       if (res.status === 201) {
-        reset();
+        await signIn("credentials", {
+          username: form.username,
+          password: form.password,
+          callbackUrl: "/",
+        });
       }
 
       if (res.status === 422) {

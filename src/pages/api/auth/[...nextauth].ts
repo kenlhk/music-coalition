@@ -42,7 +42,6 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user) throw new Error("No user found");
-          console.log(user.password, credentials!.password);
 
           const isPasswordValid = await verifyPassword(
             credentials!.password,

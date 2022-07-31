@@ -140,7 +140,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
+    <div className="absolute bottom-0 w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
