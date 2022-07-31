@@ -9,6 +9,7 @@ import {
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import Link from "next/link";
 import { Router, useRouter } from "next/router";
 import { ReactNode } from "react";
@@ -120,9 +121,9 @@ const NavBar = () => {
                 </Popover.Trigger>
                 <Popover.Content>
                   <div>
-                  <Button auto color={"gradient"} onPress={() => signOut()}>
-                    Log Out
-                  </Button>
+                    <Button auto color={"gradient"} onPress={() => signOut()}>
+                      Log Out
+                    </Button>
                   </div>
                 </Popover.Content>
               </Popover>
@@ -140,7 +141,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="absolute bottom-0 w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
+    <div className="relative w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
@@ -158,6 +159,13 @@ const Footer = () => {
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
+      <Head>
+        <title>MusicCube</title>
+        <meta
+          content="width=device-width, initial-scale=1, shrink-to-fit=no"
+          name="viewport"
+        />
+      </Head>
       <NavBar />
       <div className="flex-grow">{children}</div>
       <Footer />
