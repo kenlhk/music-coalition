@@ -1,16 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { hashPassword } from "../../../lib/auth";
 import clientPromise from "../../../lib/mongodb";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const {
-      firstName,
-      lastName,
+      username,
       email,
       password,
     }: {
-      firstName: string;
-      lastName: string;
+      username: string;
       email: string;
       password: string;
     } = req.body;
@@ -20,26 +19,32 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const existingUser = await client
       .db()
       .collection("users")
-      .findOne({ email: email });
+      .findOne({ username: username });
 
     if (existingUser) {
-      res.status(422).json({ message: "User is already registered." });
-      return;
+      return res.status(422).json({ message: "User is already registered." });
     }
 
     const newUser = {
-      firstName: firstName,
-      lastName: lastName,
+      username: username,
       email: email,
-      password: password,
+      password: await hashPassword(password),
     };
+
     const result = await client.db().collection("users").insertOne(newUser);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Created user!",
       data: { ...newUser, _id: result.insertedId.toString() },
     });
   }
+
+  return res.status(405).json({
+    error: {
+      status: 405,
+      message: "Method not allowed",
+    },
+  });
 };
 
 export default handler;

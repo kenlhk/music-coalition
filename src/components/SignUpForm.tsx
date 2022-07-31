@@ -33,6 +33,8 @@ const SignUpForm = () => {
     handleSubmit,
     control,
     formState: { errors },
+    setError,
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       username: "",
@@ -44,7 +46,35 @@ const SignUpForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async (form: FormData) => {
+    if (form.password !== form.confirmPassword) {
+      setError("confirmPassword", {
+        type: "validate",
+        message: "Passwords not identical",
+      });
+    } else {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          username: form.username,
+          email: form.email,
+          password: form.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+
+      if (res.status === 201) {
+        reset();
+      }
+
+      if (res.status === 422) {
+        setError("username", { message: data.message });
+      }
+    }
+  };
 
   return (
     <form

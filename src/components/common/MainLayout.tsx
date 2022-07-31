@@ -1,8 +1,16 @@
-import { Progress, Spacer, Text, User } from "@nextui-org/react";
-import { useSession } from "next-auth/react";
+import {
+  Button,
+  Card,
+  Popover,
+  Progress,
+  Spacer,
+  Text,
+  User,
+} from "@nextui-org/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Router } from "next/router";
+import { Router, useRouter } from "next/router";
 import { ReactNode } from "react";
 import { TbBrandGithub } from "react-icons/tb";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
@@ -36,6 +44,8 @@ const NavBar = () => {
 
   const { setOpen } = useBurgerMenuStore();
 
+  const router = useRouter();
+
   Router.events.on("routeChangeStart", () => {
     setLoading(true);
     setOpen(false);
@@ -48,6 +58,7 @@ const NavBar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 pb-1">
       <div className="flex flex-col">
+        {/* Progress Bar */}
         <div className="w-full mb-0.5">
           {isLoading ? (
             <Progress
@@ -67,36 +78,59 @@ const NavBar = () => {
           )}
         </div>
 
-        <div className="flex w-full pl-1 pr-1">
-          <div className="hidden md:inline-block w-1/3">
-            <Logo />
-          </div>
-          <div className="inline-block md:hidden w-1/2">
-            <BurgerMenu>
-              <div className="absolute top-0 left-2 p-0">
-                <Logo />
-              </div>
-              <div className="flex flex-col w-full pt-5">
-                <SearchBar status="primary" />
-                <div className="py-5 px-2">
-                  <Link href={"/"}>
-                    <a>
-                      <Text size={20}>Home</Text>
-                    </a>
-                  </Link>
+        <div className="flex w-full px-3">
+          <div className="flex items-center w-1/2 md:w-1/3">
+            <div className="hidden md:inline-block">
+              <Logo />
+            </div>
+            <div className="inline-block absolute bottom-0 h-full md:hidden w-1/2">
+              <BurgerMenu>
+                <div className="absolute top-0 left-2 p-0">
+                  <Logo />
                 </div>
-              </div>
-            </BurgerMenu>
+                <div className="flex flex-col w-full pt-5">
+                  <SearchBar status="primary" />
+                  <div className="py-5 px-2">
+                    <Link href={"/"}>
+                      <a>
+                        <Text size={20}>Home</Text>
+                      </a>
+                    </Link>
+                  </div>
+                </div>
+              </BurgerMenu>
+            </div>
           </div>
-          <div className="hidden md:inline-block w-1/3">
+
+          <div className="hidden md:inline-block flex items-end w-1/3">
             <SearchBar bordered />
           </div>
-          <div className="flex justify-end w-1/2 md:w-1/3">
-            <User
-              src={session?.user?.image as string | undefined}
-              name={session?.user?.name}
-              size="lg"
-            />
+
+          <div className="flex justify-end items-center w-1/2 md:w-1/3">
+            {status === "authenticated" ? (
+              <Popover>
+                <Popover.Trigger>
+                  <User
+                    as="button"
+                    src={session?.user?.image || "/Avatar_Placeholder.png"}
+                    name={session?.user?.name}
+                    size="lg"
+                    bordered
+                  />
+                </Popover.Trigger>
+                <Popover.Content>
+                  <div>
+                  <Button auto color={"gradient"} onPress={() => signOut()}>
+                    Log Out
+                  </Button>
+                  </div>
+                </Popover.Content>
+              </Popover>
+            ) : (
+              <Button auto color={"gradient"} onPress={() => signIn()}>
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -106,7 +140,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="absolute bottom-0 w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
+    <div className="w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
