@@ -4,20 +4,18 @@ import {
   Progress,
   Spacer,
   Text,
-  User,
+  User
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import Head from "next/head";
 import Link from "next/link";
 import { Router, useRouter } from "next/router";
-import Script from "next/script";
 import { ReactNode } from "react";
 import { TbBrandGithub } from "react-icons/tb";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
 import useLoadingStore from "../../stores/useLoadingStore";
-import BurgerMenu from "./BurgerMenu";
 
+const BurgerMenu = dynamic(() => import("./BurgerMenu"));
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
 interface MainLayoutProps {
@@ -141,7 +139,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="relative w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
+    <div className="w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
@@ -158,23 +156,12 @@ const Footer = () => {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div>
-      <Head>
-        <title>MusicCube</title>
-        <meta
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
-          name="viewport"
-        />
-      </Head>
-      <div className="flex flex-col justify-between min-h-screen min-w-screen">
-        <NavBar />
-        <main className="flex flex-col justify-between flex-grow">
-          <div>{children}</div>
-          <Footer />
-        </main>
-        <Script id="viewport-fix">{`const viewport = document.querySelector("meta[name=viewport]");
-viewport.setAttribute("content", viewport.content + ", height=" + window.innerHeight);`}</Script>
-      </div>
+    <div className="flex flex-col justify-between min-h-screen min-w-screen">
+      <NavBar />
+      <main className="flex flex-col justify-between flex-grow">
+        <div>{children}</div>
+        <Footer />
+      </main>
     </div>
   );
 };
