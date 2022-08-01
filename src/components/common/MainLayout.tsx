@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Popover,
   Progress,
   Spacer,
@@ -12,6 +11,7 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import Link from "next/link";
 import { Router, useRouter } from "next/router";
+import Script from "next/script";
 import { ReactNode } from "react";
 import { TbBrandGithub } from "react-icons/tb";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
@@ -158,17 +158,23 @@ const Footer = () => {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div className="flex flex-col justify-between min-h-screen min-w-screen">
+    <div>
       <Head>
         <title>MusicCube</title>
         <meta
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
           name="viewport"
         />
+        <Script>{`const viewport = document.querySelector("meta[name=viewport]");
+viewport.setAttribute("content", viewport.content + ", height=" + window.innerHeight);`}</Script>
       </Head>
-      <NavBar />
-      <div className="flex-grow">{children}</div>
-      <Footer />
+      <div className="flex flex-col justify-between min-h-screen min-w-screen">
+        <NavBar />
+        <main className="flex flex-col justify-between flex-grow">
+          <div>{children}</div>
+          <Footer />
+        </main>
+      </div>
     </div>
   );
 };
