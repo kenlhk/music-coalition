@@ -165,8 +165,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
           name="viewport"
         />
-        <Script>{`const viewport = document.querySelector("meta[name=viewport]");
-viewport.setAttribute("content", viewport.content + ", height=" + window.innerHeight);`}</Script>
       </Head>
       <div className="flex flex-col justify-between min-h-screen min-w-screen">
         <NavBar />
@@ -174,6 +172,8 @@ viewport.setAttribute("content", viewport.content + ", height=" + window.innerHe
           <div>{children}</div>
           <Footer />
         </main>
+        <Script id="viewport-fix">{`const viewport = document.querySelector("meta[name=viewport]");
+viewport.setAttribute("content", viewport.content + ", height=" + window.innerHeight);`}</Script>
       </div>
     </div>
   );
