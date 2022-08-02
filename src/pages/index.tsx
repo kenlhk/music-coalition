@@ -1,7 +1,4 @@
-import {
-  Canvas, MeshProps,
-  useFrame
-} from "@react-three/fiber";
+import { Canvas, MeshProps, useFrame } from "@react-three/fiber";
 import { useSession } from "next-auth/react";
 import { useRef } from "react";
 

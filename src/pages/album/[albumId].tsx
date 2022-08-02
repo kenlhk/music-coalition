@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const album = await spotifyApiWrapper
     .getAlbum(context.query.albumId as string)
     .then((res) => res.body);
-    
+
   return {
     props: {
       accessToken: accessToken,

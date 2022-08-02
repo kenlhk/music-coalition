@@ -12,7 +12,7 @@ const spotifyApiWrapper = new SpotifyWebApi({
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
-const getServerAccessToken = async () => {
+const getServerAccessToken = () => {
   return fetch("https://accounts.spotify.com/api/token/", {
     method: "POST",
     headers: {

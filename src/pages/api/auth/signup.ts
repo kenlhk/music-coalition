@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { hashPassword } from "../../../lib/auth";
+import { METHOD_NOT_ALLOWED } from "../../../lib/errors";
 import clientPromise from "../../../lib/mongodb";
+import { getUser } from "../../../lib/user";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const {
       username,
@@ -16,10 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const client = await clientPromise;
 
-    const existingUser = await client
-      .db()
-      .collection("users")
-      .findOne({ username: username });
+    const existingUser = await getUser(username);
 
     if (existingUser) {
       return res.status(422).json({ message: "User is already registered." });
@@ -39,12 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
 
-  return res.status(405).json({
-    error: {
-      status: 405,
-      message: "Method not allowed",
-    },
-  });
+  return res.status(405).json(METHOD_NOT_ALLOWED);
 };
 
-export default handler;
+export default signupHandler;

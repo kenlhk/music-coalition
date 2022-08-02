@@ -4,7 +4,7 @@ import {
   Progress,
   Spacer,
   Text,
-  User
+  User,
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -38,11 +38,8 @@ const Logo = () => {
 
 const NavBar = () => {
   const { data: session, status } = useSession();
-
   const { isLoading, setLoading } = useLoadingStore();
-
   const { setOpen } = useBurgerMenuStore();
-
   const router = useRouter();
 
   Router.events.on("routeChangeStart", () => {
@@ -159,7 +156,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
       <NavBar />
       <main className="flex flex-col justify-between flex-grow">
-        <div>{children}</div>
+        <div className="px-8 py-2">{children}</div>
         <Footer />
       </main>
     </div>

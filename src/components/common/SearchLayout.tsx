@@ -13,8 +13,8 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
   const CATEGORIES = ["tracks", "artists", "albums"];
 
   return (
-    <nav className="sticky top-0 z-0 w-full bg-black bg-opacity-90">
-      <div className="flex flex-wrap justify-between">
+    <div className="sticky top-0 z-0 w-full bg-black bg-opacity-90">
+      <div className="flex flex-wrap justify-between items-center">
         <div>
           <Text h3 css={{ alignSelf: "end" }}>
             Results for:{" "}
@@ -40,9 +40,8 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
           </Button.Group>
         </div>
       </div>
-
       <div>{children}</div>
-    </nav>
+    </div>
   );
 };
 

@@ -46,7 +46,6 @@ const LoginForm = () => {
       username: form.username,
       password: form.password,
       redirect: false,
-      callbackUrl: "/abc"
     });
 
     if (res?.status === 200) {

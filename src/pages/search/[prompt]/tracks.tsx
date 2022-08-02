@@ -79,9 +79,9 @@ const TrackSearch = (props: SearchTracksProps) => {
   );
 
   return (
-    <div>
+    <div className="flex fixed left-0">
       <VirtuosoGrid
-        style={{ height: "78vh", overflowX: "hidden" }}
+        style={{ height: "78vh", width: "100vw", overflowX: "hidden" }}
         totalCount={tracks.length}
         endReached={() => {
           fetchNextPage();

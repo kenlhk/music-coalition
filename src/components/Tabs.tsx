@@ -10,13 +10,13 @@ const StyledTabs = styled(TabsPrimitive.Root, {
 const StyledList = styled(TabsPrimitive.List, {
   flexShrink: 0,
   display: "flex",
-  borderBottom: `1px solid ${"white"}`,
+  // borderBottom: `1px solid #0072F5`,
 });
 
 const StyledTrigger = styled(TabsPrimitive.Trigger, {
   all: "unset",
   fontFamily: "inherit",
-  backgroundColor: "#16181A",
+  backgroundColor: "#697177",
   padding: "0 20px",
   height: 45,
   flex: 1,
@@ -28,10 +28,10 @@ const StyledTrigger = styled(TabsPrimitive.Trigger, {
   userSelect: "none",
   "&:first-child": { borderTopLeftRadius: 20 },
   "&:last-child": { borderTopRightRadius: 20 },
-  "&:hover": { color: "Violet" },
+  // "&:hover": { backgroundColor: "#EAF4FF" },
   "&[data-state='active']": {
-    color: "#0072F5",
-    border: "solid 2px white",
+    backgroundColor: "#0072F5",
+    // border: "solid 2px #FFFFFF",
   },
 });
 

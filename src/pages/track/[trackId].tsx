@@ -1,29 +1,21 @@
-import {
-  Avatar,
-  Col,
-  Container,
-  Grid,
-  Modal,
-  Row,
-  Spacer,
-  Text,
-  Tooltip,
-} from "@nextui-org/react";
+import { Avatar, Grid, Modal, Text, Tooltip } from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
+import { unstable_getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { ItunesSearchOptions, searchItunes } from "node-itunes-search";
 import { useState } from "react";
 import {
-  TbBrandApple,
-  TbBrandSpotify,
-  TbPlayerPause,
-  TbPlayerPlay,
-} from "react-icons/tb";
+  BsApple,
+  BsFillPlayCircleFill,
+  BsPauseCircleFill,
+  BsSpotify,
+} from "react-icons/bs";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
+import SaveButton from "../../components/SaveButton";
 import {
   Tabs,
   TabsContent,
@@ -36,6 +28,8 @@ import {
   spotifyApiWrapper,
   spotifyAxiosClient,
 } from "../../lib/spotify";
+import { getSavedTracks } from "../../lib/user";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -46,6 +40,7 @@ interface TrackPageProps {
   videos?: Youtube.Video[];
   lyrics?: string;
   itunesURL?: string;
+  saved?: boolean;
 }
 
 const Track = (props: TrackPageProps) => {
@@ -74,149 +69,165 @@ const Track = (props: TrackPageProps) => {
   };
 
   return (
-    <div>
-      <Grid.Container justify="space-around" css={{ width: "100%" }}>
-        <Grid md={4}>
-          <Col>
-            <Text h2>{props.track.name}</Text>
-            <Text h3>
-              {props.artists.map((artist) => artist.name).join(", ")}
-            </Text>
-          </Col>
-        </Grid>
-        <Grid md={8} justify="flex-end">
-          <Avatar.Group css={{ float: "right" }}>
-            {props.artists.map((artist, index) => (
-              <Tooltip
-                key={index}
-                content={<Text>{artist.name}</Text>}
-                rounded
-                color="primary"
-                placement="bottomStart"
-              >
-                <Link
-                  href={{
-                    pathname: "/artist/[artistId]",
-                    query: {
-                      artistId: artist.id,
-                    },
-                  }}
-                >
-                  <Avatar
-                    css={{ size: "$20", zIndex: 0 }}
-                    pointer
-                    src={artist.images.length > 0 ? artist.images[2].url : ""}
-                    text={artist.images.length == 0 ? artist.name : ""}
-                    bordered
-                    color="gradient"
-                    stacked
-                  />
-                </Link>
-              </Tooltip>
-            ))}
-          </Avatar.Group>
-        </Grid>
-      </Grid.Container>
-
-      <Container className="m-5">
-        <Row justify="center">
-          {props.album.images[1] ? (
-            <Image src={props.album.images[0].url} height={400} width={400} />
-          ) : (
-            <p>No Album Cover</p>
-          )}
-        </Row>
-      </Container>
-
-      <Container>
-        <Row>
-          <Col>
-            <Text h3>Preview:</Text>
-            {props.track.preview_url ? (
-              <div>
-                <ReactPlayer
-                  key={"react-player"}
-                  url={props.track.preview_url}
-                  playing={playing}
-                  width={0}
-                  height={0}
-                  onPause={handlePause}
-                />
-                <a onClick={handlePlayPause}>
-                  {playing ? (
-                    <TbPlayerPause size={30} />
-                  ) : (
-                    <TbPlayerPlay size={30} />
-                  )}
-                </a>
-              </div>
-            ) : (
-              <p>No preview available.</p>
-            )}
-          </Col>
-          <Col>
-            <Text h3>Play full song on:</Text>
-            <Row>
-              {props.track.external_urls.spotify && (
-                <a
-                  href={props.track.external_urls.spotify}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <TbBrandSpotify size={50} color={"#1DB954"} />
-                </a>
-              )}
-              <Spacer />
-              {props.itunesURL && (
-                <a
-                  href={props.itunesURL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <TbBrandApple size={50} color={"#555555"} />
-                </a>
-              )}
-            </Row>
-          </Col>
-        </Row>
-      </Container>
-
-      <Spacer />
-      <Tabs defaultValue="tab1">
-        <TabsList>
-          <TabsTrigger value="tab1">
-            <Text h3>Videos</Text>
-          </TabsTrigger>
-          <TabsTrigger value="tab2">
-            <Text h3>Lyrics</Text>
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="tab1">
-          <Text h3>Related Videos:</Text>
-          {props.videos ? (
-            <Grid.Container gap={2} alignItems={"center"} justify={"center"}>
-              {props.videos.map((video, index) => (
-                <Grid
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col md:flex-row justify-between w-full item-stretch">
+        <div className="flex flex-col">
+          <Text className="text-2xl md:text-3xl font-bold">
+            {props.track.name}
+          </Text>
+          <Text className="text-base md:text-2xl">
+            {props.artists.map((artist) => artist.name).join(", ")}
+          </Text>
+        </div>
+        <div className="flex justify-end">
+          <Avatar.Group
+            count={
+              props.artists.length - 4 > 0
+                ? props.artists.length - 4
+                : undefined
+            }
+          >
+            {props.artists
+              .filter((artist, index) => index < 4)
+              .map((artist, index) => (
+                <Tooltip
                   key={index}
-                  onClick={() => handleVideoModalOpen(video.link)}
+                  content={<Text>{artist.name}</Text>}
+                  rounded
+                  color="primary"
+                  placement="bottomStart"
                 >
-                  <VideoCard title={video.title} thumbnail={video.thumbnail} />
-                </Grid>
+                  <Link
+                    href={{
+                      pathname: "/artist/[artistId]",
+                      query: {
+                        artistId: artist.id,
+                      },
+                    }}
+                  >
+                    <Avatar
+                      css={{ size: "10vh", zIndex: 0 }}
+                      pointer
+                      src={artist.images.length > 0 ? artist.images[2].url : ""}
+                      text={artist.images.length == 0 ? artist.name : ""}
+                      bordered
+                      color="gradient"
+                      stacked
+                    />
+                  </Link>
+                </Tooltip>
               ))}
-            </Grid.Container>
-          ) : (
-            <p>No video found.</p>
-          )}
-        </TabsContent>
-        <TabsContent value="tab2">
-          <Text h3>Lyrics:</Text>
-          {props.lyrics ? (
-            <Text style={{ whiteSpace: "pre-line" }}>{props.lyrics}</Text>
-          ) : (
-            <p>No lyrics found.</p>
-          )}
-        </TabsContent>
-      </Tabs>
+          </Avatar.Group>
+        </div>
+      </div>
+
+      <div className="flex justify-center w-full">
+        {props.album.images[1] ? (
+          <Image
+            src={props.album.images[0].url}
+            height={300}
+            width={300}
+            alt="Cover"
+          />
+        ) : (
+          <p>No Album Cover</p>
+        )}
+      </div>
+      <div className="flex justify-center">
+        <SaveButton />
+      </div>
+      <div className="flex justify-center">
+        <Tabs defaultValue="tab1" className="max-w-6xl">
+          <TabsList>
+            <TabsTrigger value="tab1">
+              <Text h4>Details</Text>
+            </TabsTrigger>
+            <TabsTrigger value="tab2">
+              <Text h4>Videos</Text>
+            </TabsTrigger>
+            <TabsTrigger value="tab3">
+              <Text h4>Lyrics</Text>
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <div className="flex flex-col md:flex-row justify-around gap-5">
+              <div className="flex flex-col items-center">
+                <Text h4>Preview:</Text>
+                {props.track.preview_url ? (
+                  <div>
+                    <ReactPlayer
+                      key={"react-player"}
+                      url={props.track.preview_url}
+                      playing={playing}
+                      width={0}
+                      height={0}
+                      onPause={handlePause}
+                    />
+                    <a onClick={handlePlayPause}>
+                      {playing ? (
+                        <BsPauseCircleFill size={40} />
+                      ) : (
+                        <BsFillPlayCircleFill size={40} />
+                      )}
+                    </a>
+                  </div>
+                ) : (
+                  <Text>No preview available.</Text>
+                )}
+              </div>
+              <div className="flex flex-col items-center">
+                <Text h4>Play full song on:</Text>
+                <div className="flex justify-center gap-x-10 w-full">
+                  {props.track.external_urls.spotify && (
+                    <a
+                      href={props.track.external_urls.spotify}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <BsSpotify size={40} color={"#1DB954"} />
+                    </a>
+                  )}
+                  {props.itunesURL && (
+                    <a
+                      href={props.itunesURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <BsApple size={40} color={"#A2AAAD"} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="tab2">
+            {props.videos ? (
+              <Grid.Container gap={1} justify={"center"}>
+                {props.videos.map((video, index) => (
+                  <Grid
+                    key={index}
+                    onClick={() => handleVideoModalOpen(video.link)}
+                  >
+                    <VideoCard
+                      title={video.title}
+                      thumbnail={video.thumbnail}
+                    />
+                  </Grid>
+                ))}
+              </Grid.Container>
+            ) : (
+              <p>No video found.</p>
+            )}
+          </TabsContent>
+          <TabsContent value="tab3">
+            {props.lyrics ? (
+              <Text style={{ whiteSpace: "pre-line" }}>{props.lyrics}</Text>
+            ) : (
+              <p>No lyrics found.</p>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <Modal
         open={visible}
