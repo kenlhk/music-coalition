@@ -1,4 +1,4 @@
-import { Avatar, Grid, Spacer, Text } from "@nextui-org/react";
+import { Avatar, Grid, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import ArtistCard from "../../components/artist/ArtistCard";
 import TrackCard from "../../components/track/TrackCard";
@@ -12,55 +12,52 @@ interface ArtistPageProps {
 
 const Artist = (props: ArtistPageProps) => {
   return (
-    <div>
-      <Grid.Container justify="space-around">
-        <Grid md={2}>
-          <div className="flex flex-col items-center">
-            <Avatar
-              src={
-                props.artist.images.length > 0
-                  ? props.artist.images[1].url
-                  : "/Avatar_Placeholder.png"
-              }
-              css={{ size: "$50", zIndex: 0 }}
-              color="gradient"
-            />
-            <Text h2 css={{}}>
-              {props.artist.name}
-            </Text>
-          </div>
-        </Grid>
-        <Grid md={10}>
-          <div className="flex flex-col items-start">
-            <Text h3>Top Tracks:</Text>
-            <Grid.Container gap={1} justify="center">
-              {props.topTracks.map((track, index) => (
-                <Grid key={index}>
-                  <TrackCard
-                    id={track.id.toString()}
-                    name={track.name}
-                    artistNames={track.artists.map((artist) => artist.name)}
-                    cover={track.album?.images[1]?.url}
-                  />
-                </Grid>
-              ))}
-            </Grid.Container>
-            <Spacer />
-            <Text h3>Related Artists:</Text>
-            <Grid.Container gap={1} justify="center">
-              {props.relatedArtists.map((artist, index) => (
-                <Grid key={index}>
-                  <ArtistCard
-                    id={artist.id.toString()}
-                    name={artist.name}
-                    image={artist.images[1]?.url}
-                  />
-                </Grid>
-              ))}
-            </Grid.Container>
-          </div>
-        </Grid>
-      </Grid.Container>
+    <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col items-center p-2 border">
+        <Avatar
+          src={
+            props.artist.images.length > 0
+              ? props.artist.images[1].url
+              : "/Avatar_Placeholder.png"
+          }
+          css={{ size: "200px", zIndex: 0 }}
+          color="gradient"
+        />
+        <Text h3>{props.artist.name}</Text>
+      </div>
+
+      <div className="flex flex-col items-start">
+        <div>
+          <Text h4>Top Tracks:</Text>
+          <Grid.Container gap={1} justify="center">
+            {props.topTracks.map((track, index) => (
+              <Grid key={index}>
+                <TrackCard
+                  id={track.id.toString()}
+                  name={track.name}
+                  artistNames={track.artists.map((artist) => artist.name)}
+                  cover={track.album?.images[1]?.url}
+                />
+              </Grid>
+            ))}
+          </Grid.Container>
+        </div>
+
+        <div>
+          <Text h4>Related Artists:</Text>
+          <Grid.Container gap={1} justify="center">
+            {props.relatedArtists.map((artist, index) => (
+              <Grid key={index}>
+                <ArtistCard
+                  id={artist.id.toString()}
+                  name={artist.name}
+                  image={artist.images[1]?.url}
+                />
+              </Grid>
+            ))}
+          </Grid.Container>
+        </div>
+      </div>
     </div>
   );
 };

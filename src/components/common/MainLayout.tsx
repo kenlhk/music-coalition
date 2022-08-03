@@ -1,10 +1,10 @@
 import {
+  Avatar,
   Button,
   Popover,
   Progress,
   Spacer,
   Text,
-  User,
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -76,7 +76,7 @@ const NavBar = () => {
 
         <div className="flex w-full px-3">
           <div className="flex items-center w-1/2 md:w-1/3">
-            <div className="hidden md:inline-block">
+            <div className="hidden md:inline-block w-full">
               <Logo />
             </div>
             <div className="inline-block absolute bottom-0 h-full md:hidden w-1/2">
@@ -86,10 +86,15 @@ const NavBar = () => {
                 </div>
                 <div className="flex flex-col w-full pt-5">
                   <SearchBar status="primary" />
-                  <div className="py-5 px-2">
+                  <div className="flex flex-col py-5 px-2 gap-2">
                     <Link href={"/"}>
                       <a>
                         <Text size={20}>Home</Text>
+                      </a>
+                    </Link>
+                    <Link href={"/library/tracks"}>
+                      <a>
+                        <Text size={20}>Library</Text>
                       </a>
                     </Link>
                   </div>
@@ -102,30 +107,52 @@ const NavBar = () => {
             <SearchBar bordered />
           </div>
 
-          <div className="flex justify-end items-center w-1/2 md:w-1/3">
+          <div className="flex justify-end items-center w-1/2 md:w-1/3 md:gap-10">
+            <div className="hidden md:inline-block">
+              <Link href={"/library/tracks"}>
+                <a>
+                  <Text size={20}>Library</Text>
+                </a>
+              </Link>
+            </div>
+
             {status === "authenticated" ? (
               <Popover>
                 <Popover.Trigger>
-                    <User
-                      as="button"
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <Avatar
                       src={session?.user?.image || "/Avatar_Placeholder.png"}
-                      name={session?.user?.name}
                       size="lg"
-                      bordered
                       color="gradient"
+                      bordered
+                      css={{ cursor: "pointer" }}
                     />
+                    <Text h4 color="primary">
+                      {session.user?.name}
+                    </Text>
+                  </div>
                 </Popover.Trigger>
                 <Popover.Content>
                   <div>
-                    <Button auto color={"gradient"} onPress={() => signOut()}>
-                      Log Out
+                    <Button
+                      auto
+                      css={{ p: 20 }}
+                      color={"gradient"}
+                      onPress={() => signOut()}
+                    >
+                      <Text size={20}>Log Out</Text>
                     </Button>
                   </div>
                 </Popover.Content>
               </Popover>
             ) : (
-              <Button auto color={"gradient"} onPress={() => signIn()}>
-                Login
+              <Button
+                auto
+                css={{ p: 20 }}
+                color={"gradient"}
+                onPress={() => signIn()}
+              >
+                <Text size={20}>Login</Text>
               </Button>
             )}
           </div>
@@ -156,7 +183,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
       <NavBar />
-      <main className="flex flex-col justify-between flex-grow md:px-8 px-4 pt-2">
+      <main className="flex flex-col justify-between flex-grow md:px-8 px-2 pt-2">
         <div>{children}</div>
         <Footer />
       </main>

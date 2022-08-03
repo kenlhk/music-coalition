@@ -24,7 +24,7 @@ const SearchLayout = ({ children }: SearchLayoutProps) => {
           </Text>
         </div>
         <div>
-          <Button.Group color="gradient">
+          <Button.Group color="secondary">
             {CATEGORIES.map((category, index) => (
               <Button
                 key={index}

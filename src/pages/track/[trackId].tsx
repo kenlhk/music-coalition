@@ -10,7 +10,7 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify
+  BsSpotify,
 } from "react-icons/bs";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
@@ -19,13 +19,13 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../lib/spotify";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -233,7 +233,7 @@ const Track = (props: TrackPageProps) => {
         width="1000px"
         closeButton
       >
-        <Modal.Body css={{ height: "75vh", pt:30 }}>
+        <Modal.Body css={{ height: "75vh", pt: 30 }}>
           <ReactPlayer
             url={videoLink}
             config={{ youtube: { playerVars: { controls: 1 } } }}

@@ -9,7 +9,7 @@ import SearchLayout from "../../../components/common/SearchLayout";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../../lib/spotify";
 
 interface SearchAlbumProps {
