@@ -1,9 +1,12 @@
 import { Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
-import { TableVirtuoso } from "react-virtuoso";
 import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
+
+const AlbumTable = dynamic(() => import("../../components/album/AlbumTable"), {
+  ssr: false,
+});
 
 interface AlbumPageProps {
   accessToken: string;
@@ -11,25 +14,24 @@ interface AlbumPageProps {
 }
 
 const Album = (props: AlbumPageProps) => {
-  const [tracks, setTracks] = useState(props.album.tracks.items);
-
   return (
-    <div>
-      <Image src={props.album.images[0].url} width={400} height={400} />
-      <Text h2>{props.album.name}</Text>
-      <Text h3>
-        {props.album.artists.map((artist) => artist.name).join(", ")}
-      </Text>
-      <TableVirtuoso
-        style={{ height: 400 }}
-        data={tracks}
-        itemContent={(index, track) => (
-          <>
-            <td style={{ width: 150 }}>{track.name}</td>
-            <td>{track.name}</td>
-          </>
-        )}
-      />
+    <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col items-center p-5">
+        <Image
+          src={props.album.images[0].url}
+          height={250}
+          width={250}
+          alt="Cover"
+        />
+        <Text h4>{props.album.name}</Text>
+        <Text h5>
+          {props.album.artists.map((artist) => artist.name).join(", ")}
+        </Text>
+      </div>
+
+      <div className="flex flex-grow justify-center">
+        <AlbumTable tracks={props.album.tracks.items} />
+      </div>
     </div>
   );
 };

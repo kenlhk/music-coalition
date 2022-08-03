@@ -41,6 +41,7 @@ const SaveButton = () => {
       bordered={!saved}
       onPress={() => handleSave()}
       color="gradient"
+      className="z-0"
     >
       <Text>{saved ? "Unsave" : "Save"}</Text>
     </Button>

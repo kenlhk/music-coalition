@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
-import ArtistCard from "../../../components/ArtistCard";
+import ArtistCard from "../../../components/artist/ArtistCard";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
 import {

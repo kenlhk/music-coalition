@@ -1,7 +1,7 @@
 import { Avatar, Grid, Spacer, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
-import ArtistCard from "../../components/ArtistCard";
-import TrackCard from "../../components/TrackCard";
+import ArtistCard from "../../components/artist/ArtistCard";
+import TrackCard from "../../components/track/TrackCard";
 import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
 
 interface ArtistPageProps {

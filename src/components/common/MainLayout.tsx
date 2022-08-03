@@ -106,13 +106,14 @@ const NavBar = () => {
             {status === "authenticated" ? (
               <Popover>
                 <Popover.Trigger>
-                  <User
-                    as="button"
-                    src={session?.user?.image || "/Avatar_Placeholder.png"}
-                    name={session?.user?.name}
-                    size="lg"
-                    bordered
-                  />
+                    <User
+                      as="button"
+                      src={session?.user?.image || "/Avatar_Placeholder.png"}
+                      name={session?.user?.name}
+                      size="lg"
+                      bordered
+                      color="gradient"
+                    />
                 </Popover.Trigger>
                 <Popover.Content>
                   <div>
@@ -136,7 +137,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="w-full p-1 z-40 flex justify-center bg-black bg-opacity-90">
+    <div className="w-full z-40 flex justify-center bg-black bg-opacity-90 p-2">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a
@@ -155,8 +156,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
       <NavBar />
-      <main className="flex flex-col justify-between flex-grow">
-        <div className="px-8 py-2">{children}</div>
+      <main className="flex flex-col justify-between flex-grow md:px-8 px-4 pt-2">
+        <div>{children}</div>
         <Footer />
       </main>
     </div>

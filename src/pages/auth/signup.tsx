@@ -1,5 +1,5 @@
 import { Text } from "@nextui-org/react";
-import SignUpForm from "../../components/SignUpForm";
+import SignUpForm from "../../components/auth/SignUpForm";
 
 const signup = () => {
   return (

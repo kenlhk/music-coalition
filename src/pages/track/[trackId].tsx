@@ -1,7 +1,6 @@
 import { Avatar, Grid, Modal, Text, Tooltip } from "@nextui-org/react";
 import * as Genius from "genius-lyrics";
 import { GetServerSideProps } from "next";
-import { unstable_getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,25 +10,23 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify,
+  BsSpotify
 } from "react-icons/bs";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
-import SaveButton from "../../components/SaveButton";
+import SaveButton from "../../components/track/SaveButton";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../lib/spotify";
-import { getSavedTracks } from "../../lib/user";
-import { authOptions } from "../api/auth/[...nextauth]";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -233,11 +230,10 @@ const Track = (props: TrackPageProps) => {
         open={visible}
         onClose={handleVideoModalClose}
         blur
-        width="70%"
-        css={{ borderRadius: 20, alignItems: "center", height: "80vh" }}
+        width="1000px"
         closeButton
       >
-        <Modal.Body style={{ width: "90%" }}>
+        <Modal.Body css={{ height: "75vh", pt:30 }}>
           <ReactPlayer
             url={videoLink}
             config={{ youtube: { playerVars: { controls: 1 } } }}

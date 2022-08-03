@@ -6,7 +6,7 @@ import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
 import SearchLayout from "../../../components/common/SearchLayout";
 import MoreButton from "../../../components/MoreButton";
-import TrackCard from "../../../components/TrackCard";
+import TrackCard from "../../../components/track/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,

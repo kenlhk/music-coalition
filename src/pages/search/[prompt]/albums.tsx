@@ -4,13 +4,12 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
-import AlbumCard from "../../../components/AlbumCard";
+import AlbumCard from "../../../components/album/AlbumCard";
 import SearchLayout from "../../../components/common/SearchLayout";
-import MoreButton from "../../../components/MoreButton";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../../lib/spotify";
 
 interface SearchAlbumProps {
