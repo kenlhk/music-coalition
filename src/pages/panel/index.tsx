@@ -63,11 +63,10 @@ const Panel = (props: PanelProps) => {
 
   return (
     <div className="flex flex-col md:flex-row">
-      {/* <button onClick={() => setExpand(!expand)}>Open</button> */}
       <Collapse
         shadow
         title="Panel"
-        subtitle="Select the attributes of your favourite songs"
+        subtitle="Recommmand songs based on your preferences"
         css={{
           blockSize: "fit-content",
         }}

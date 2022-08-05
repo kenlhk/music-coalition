@@ -1,5 +1,5 @@
-import { Avatar, Grid, Modal, Text, Tooltip } from "@nextui-org/react";
-import * as Genius from "genius-lyrics";
+import { Avatar, Grid, Loading, Modal, Text, Tooltip } from "@nextui-org/react";
+import axios from "axios";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import {
   BsPauseCircleFill,
   BsSpotify,
 } from "react-icons/bs";
+import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
 import {
@@ -67,6 +68,26 @@ const Track = (props: TrackPageProps) => {
   };
 
   const { setUrl, playing, setPlaying } = useBackgroundPlayerStore();
+
+  // Fetch lyrics from Genius in client side
+  const lyricsFetcher = async () => {
+    const res = await axios.get("/api/track/lyrics", {
+      params: {
+        track: props.track.name,
+        artists: props.artists.map((artist) => artist.name).join(" "),
+      },
+    });
+    return res.data.lyrics;
+  };
+
+  const { data: lyrics, isLoading: isLoadingLyrics } = useQuery(
+    ["lyrics"],
+    lyricsFetcher,
+    {
+      cacheTime: 100,
+      staleTime: 0,
+    }
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -210,11 +231,15 @@ const Track = (props: TrackPageProps) => {
             )}
           </TabsContent>
           <TabsContent value="tab3">
-            {props.lyrics ? (
-              <Text style={{ whiteSpace: "pre-line" }}>{props.lyrics}</Text>
-            ) : (
-              <p>No lyrics found.</p>
-            )}
+            <div className="flex justify-center">
+              {isLoadingLyrics ? (
+                <Loading />
+              ) : lyrics ? (
+                <Text style={{ whiteSpace: "pre-line" }}>{lyrics}</Text>
+              ) : (
+                <p>No lyrics found.</p>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -279,17 +304,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   );
 
   // Fetch lyrics from Genius
-  const client = new Genius.Client();
-  let lyrics;
-  try {
-    const searches = await client.songs.search(
-      `${track.name} ${artistsQueryString}`
-    );
-    const firstSong = searches[0];
-    lyrics = await firstSong.lyrics();
-  } catch (error) {
-    (error: Error) => console.log(error);
-  }
+  // const client = new Genius.Client();
+  // let lyrics;
+  // try {
+  //   const searches = await client.songs.search(
+  //     `${track.name} ${artistsQueryString}`
+  //   );
+  //   const firstSong = searches[0];
+  //   lyrics = await firstSong.lyrics();
+  // } catch (error) {
+  //   (error: Error) => console.log(error);
+  // }
 
   return {
     props: {
@@ -297,7 +322,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       artists: artists,
       album: track.album,
       videos: videos || null,
-      lyrics: lyrics || null,
+      // lyrics: lyrics || null,
       itunesURL: itunesURL,
     },
   };
