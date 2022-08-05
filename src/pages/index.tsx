@@ -1,7 +1,6 @@
 import { Text } from "@nextui-org/react";
 import { Canvas, MeshProps, useFrame } from "@react-three/fiber";
-import { useSession } from "next-auth/react";
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 
 const Box: React.FC<MeshProps> = ({ position, color }) => {
   const ref = useRef<MeshProps>();
@@ -10,14 +9,12 @@ const Box: React.FC<MeshProps> = ({ position, color }) => {
   return (
     <mesh position={position} ref={ref}>
       <boxBufferGeometry args={[1, 1, 1]} attach="geometry" />
-      <meshPhongMaterial color={color} attach="material"/>
+      <meshPhongMaterial color={color} attach="material" />
     </mesh>
   );
 };
 
 const Home = () => {
-  const session = useSession();
-
   return (
     <div className="flex flex-col items-center">
       <Canvas style={{ height: "50vh" }}>

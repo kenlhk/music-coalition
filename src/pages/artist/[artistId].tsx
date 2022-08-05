@@ -32,12 +32,7 @@ const Artist = (props: ArtistPageProps) => {
           <Grid.Container gap={1} justify="center">
             {props.topTracks.map((track, index) => (
               <Grid key={index}>
-                <TrackCard
-                  id={track.id.toString()}
-                  name={track.name}
-                  artistNames={track.artists.map((artist) => artist.name)}
-                  cover={track.album?.images[1]?.url}
-                />
+                <TrackCard track={track} />
               </Grid>
             ))}
           </Grid.Container>

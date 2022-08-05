@@ -46,7 +46,7 @@ const StyledThumb = styled(SliderPrimitive.Thumb, {
   boxShadow: `0 2px 10px grey`,
   borderRadius: 10,
   "&:hover": { backgroundColor: "#0072F5" },
-  "&:focus": { boxShadow: `0 0 0 5px black` },
+  "&:focus": { boxShadow: `0 0 0 5px #16181A` },
 });
 
 interface SliderProps {

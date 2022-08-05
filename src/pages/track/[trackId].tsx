@@ -14,19 +14,20 @@ import {
 } from "react-icons/bs";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
-import SaveButton from "../../components/track/SaveButton";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "../../components/Tabs";
+import SaveButton from "../../components/track/SaveButton";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
   spotifyAxiosClient,
 } from "../../lib/spotify";
+import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -42,10 +43,10 @@ interface TrackPageProps {
 
 const Track = (props: TrackPageProps) => {
   const [videoLink, setVideoLink] = useState("");
-  const [playing, setPlaying] = useState(false);
   const [visible, setVisible] = useState(false);
 
   const handlePlayPause = () => {
+    setUrl(props.track.preview_url);
     setPlaying(!playing);
   };
 
@@ -64,6 +65,8 @@ const Track = (props: TrackPageProps) => {
     setPlaying(false);
     setVisible(false);
   };
+
+  const { setUrl, playing, setPlaying } = useBackgroundPlayerStore();
 
   return (
     <div className="flex flex-col gap-5">
@@ -151,23 +154,13 @@ const Track = (props: TrackPageProps) => {
               <div className="flex flex-col items-center">
                 <Text h4>Preview:</Text>
                 {props.track.preview_url ? (
-                  <div>
-                    <ReactPlayer
-                      key={"react-player"}
-                      url={props.track.preview_url}
-                      playing={playing}
-                      width={0}
-                      height={0}
-                      onPause={handlePause}
-                    />
-                    <a onClick={handlePlayPause}>
-                      {playing ? (
-                        <BsPauseCircleFill size={40} />
-                      ) : (
-                        <BsFillPlayCircleFill size={40} />
-                      )}
-                    </a>
-                  </div>
+                  <a onClick={handlePlayPause}>
+                    {playing ? (
+                      <BsPauseCircleFill size={40} />
+                    ) : (
+                      <BsFillPlayCircleFill size={40} />
+                    )}
+                  </a>
                 ) : (
                   <Text>No preview available.</Text>
                 )}

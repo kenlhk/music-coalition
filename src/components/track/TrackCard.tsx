@@ -1,15 +1,28 @@
 import { Card, Col, Row, Text } from "@nextui-org/react";
 import Link from "next/link";
+import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 
 interface TrackCardProps {
-  id: string;
-  name: string;
-  artistNames: string[];
-  cover?: string;
+  track: SpotifyApi.TrackObjectFull;
 }
 
 const TrackCard = (props: TrackCardProps) => {
-  const artists = props.artistNames.join(", ");
+  const artists = props.track.artists.map((artist) => artist.name).join(", ");
+  const { auto, setUrl, setPlaying } = useBackgroundPlayerStore();
+
+  const handleMouseEnter = () => {
+    if (auto) {
+      setPlaying(true);
+      setUrl(props.track.preview_url);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (auto) {
+      setPlaying(false);
+      setUrl(null);
+    }
+  };
 
   return (
     <div className="w-40 md:w-full">
@@ -17,15 +30,21 @@ const TrackCard = (props: TrackCardProps) => {
         href={{
           pathname: "/track/[trackId]",
           query: {
-            trackId: props.id,
+            trackId: props.track.id,
           },
         }}
       >
         <a>
-          <Card css={{ border: "none" }} isPressable>
+          <Card
+            css={{ border: "none" }}
+            isPressable
+            isHoverable
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <Card.Body css={{ p: 0 }}>
               <Card.Image
-                src={props.cover || ""}
+                src={props.track.album.images[1].url || ""}
                 objectFit="cover"
                 alt="Album cover"
                 height={"180px"}
@@ -51,7 +70,7 @@ const TrackCard = (props: TrackCardProps) => {
                     color="#FFF"
                     size={"80%"}
                   >
-                    {props.name}
+                    {props.track.name}
                   </Text>
                   <Text className="truncate" color="#FFF" size={"70%"}>
                     {artists}

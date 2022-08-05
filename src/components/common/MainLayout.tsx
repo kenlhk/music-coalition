@@ -4,17 +4,21 @@ import {
   Loading,
   Popover,
   Progress,
-  Spacer,
-  Text
+  Switch,
+  Text,
+  Tooltip,
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Router, useRouter } from "next/router";
 import { ReactNode } from "react";
-import { TbBrandGithub } from "react-icons/tb";
+import { BsPlayFill } from "react-icons/bs";
+import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
 import useLoadingStore from "../../stores/useLoadingStore";
+import BackgroundPlayer from "../BackgroundPlayer";
+import Footer from "./Footer";
 
 const BurgerMenu = dynamic(() => import("./BurgerMenu"));
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
@@ -34,6 +38,18 @@ const Logo = () => {
     >
       <Link href={"/"}>MusicCube</Link>
     </Text>
+  );
+};
+
+const AutoSwitch = () => {
+  const { auto, setAuto } = useBackgroundPlayerStore();
+  return (
+    <Switch
+      initialChecked={auto}
+      checked={auto}
+      onChange={(en) => setAuto(en.target.checked)}
+      icon={<BsPlayFill />}
+    />
   );
 };
 
@@ -85,24 +101,30 @@ const NavBar = () => {
                 <div className="absolute top-0 left-2 p-0">
                   <Logo />
                 </div>
-                <div className="flex flex-col w-full pt-5">
+                <div className="flex flex-col w-full pt-5 h-full">
                   <SearchBar status="primary" />
-                  <div className="flex flex-col py-5 px-2 gap-2">
-                    <Link href={"/"}>
-                      <a>
-                        <Text size={20}>Home</Text>
-                      </a>
-                    </Link>
-                    <Link href={"/panel"}>
-                      <a>
-                        <Text size={20}>Panel</Text>
-                      </a>
-                    </Link>
-                    <Link href={"/library/tracks"}>
-                      <a>
-                        <Text size={20}>Library</Text>
-                      </a>
-                    </Link>
+                  <div className="flex flex-col h-[85%] justify-between">
+                    <div className="flex flex-col py-5 px-2 gap-2">
+                      <Link href={"/"}>
+                        <a>
+                          <Text size={20}>Home</Text>
+                        </a>
+                      </Link>
+                      <Link href={"/panel"}>
+                        <a>
+                          <Text size={20}>Panel</Text>
+                        </a>
+                      </Link>
+                      <Link href={"/library/tracks"}>
+                        <a>
+                          <Text size={20}>Library</Text>
+                        </a>
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 place-items-center">
+                      <Text h5>Quick Preview: </Text>
+                      <AutoSwitch />
+                    </div>
                   </div>
                 </div>
               </BurgerMenu>
@@ -114,7 +136,7 @@ const NavBar = () => {
           </div>
 
           <div className="flex justify-end items-center w-1/2 lg:w-1/3 lg:gap-10">
-            <div className="hidden lg:flex gap-5">
+            <div className="hidden lg:flex gap-5 lg:items-center">
               <Link href={"/panel"}>
                 <a>
                   <Text size={20}>Panel</Text>
@@ -125,6 +147,13 @@ const NavBar = () => {
                   <Text size={20}>Library</Text>
                 </a>
               </Link>
+              <Tooltip
+                content={<Text h5>Quick Preview</Text>}
+                placement={"bottom"}
+                color="primary"
+              >
+                <AutoSwitch />
+              </Tooltip>
             </div>
 
             {status === "authenticated" ? (
@@ -175,23 +204,6 @@ const NavBar = () => {
   );
 };
 
-const Footer = () => {
-  return (
-    <div className="w-full z-30 flex justify-center bg-black bg-opacity-90 p-2">
-      <Text>Developed by Ken</Text>
-      <Spacer x={0.5} />
-      <a
-        href={"https://github.com/kenlhk/music-coalition"}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-inherit"
-      >
-        <TbBrandGithub size={30} />
-      </a>
-    </div>
-  );
-};
-
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
@@ -199,6 +211,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <main className="flex flex-col justify-between flex-grow md:px-8 px-2 pt-2">
         <div>{children}</div>
         <Footer />
+        <BackgroundPlayer />
       </main>
     </div>
   );

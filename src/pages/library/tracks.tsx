@@ -1,6 +1,7 @@
 import { Grid, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import { unstable_getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import TrackCard from "../../components/track/TrackCard";
 import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
 import { getSavedTracks } from "../../lib/user";
@@ -11,19 +12,17 @@ interface TrackLibraryProps {
 }
 
 const TrackLibrary = (props: TrackLibraryProps) => {
+  const session = useSession();
   return (
     <div>
       <Text h3>Saved Tracks:</Text>
-      {props.tracks.length > 0 ? (
+      {session.status === "unauthenticated" ? (
+        <Text>Please login to view your saved tracks.</Text>
+      ) : props.tracks.length > 0 ? (
         <Grid.Container gap={1}>
           {props.tracks.map((track, index) => (
             <Grid key={index}>
-              <TrackCard
-                id={track.id.toString()}
-                name={track.name}
-                artistNames={track.artists.map((artist) => artist.name)}
-                cover={track.album?.images[1]?.url}
-              />
+              <TrackCard track={track} />
             </Grid>
           ))}
         </Grid.Container>

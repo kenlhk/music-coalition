@@ -9,7 +9,7 @@ import TrackCard from "../../../components/track/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient
+  spotifyAxiosClient,
 } from "../../../lib/spotify";
 
 interface SearchTracksProps {
@@ -92,14 +92,7 @@ const TrackSearch = (props: SearchTracksProps) => {
         itemContent={(index) => (
           <div>
             <Grid>
-              <TrackCard
-                id={tracks[index].id.toString()}
-                name={tracks[index].name}
-                artistNames={tracks[index].artists.map(
-                  (artist: SpotifyApi.ArtistObjectSimplified) => artist.name
-                )}
-                cover={tracks[index].album?.images[1]?.url}
-              />
+              <TrackCard track={tracks[index]} />
             </Grid>
           </div>
         )}

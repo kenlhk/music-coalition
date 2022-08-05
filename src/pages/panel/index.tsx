@@ -56,8 +56,10 @@ const Panel = (props: PanelProps) => {
 
   // Temporary fix of initial collapse bug
   useEffect(() => {
-    setExpanded(true);
-  }, []);
+    setTimeout(() => {
+      setExpanded(true);
+    }, 100);
+  });
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -127,12 +129,7 @@ const Panel = (props: PanelProps) => {
             <Grid.Container gap={1} justify="center">
               {data?.map((track, index) => (
                 <Grid key={index}>
-                  <TrackCard
-                    id={track.id.toString()}
-                    name={track.name}
-                    artistNames={track.artists.map((artist) => artist.name)}
-                    cover={track.album?.images[1]?.url}
-                  />
+                  <TrackCard track={track} />
                 </Grid>
               ))}
             </Grid.Container>
