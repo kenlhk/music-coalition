@@ -20,7 +20,7 @@ const SaveButton = () => {
     if (session.status === "authenticated") {
       checkSaved();
     }
-  }, []);
+  }, [trackId, session.status]);
 
   const handleSave = async () => {
     if (session.status === "authenticated") {

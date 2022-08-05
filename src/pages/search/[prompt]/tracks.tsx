@@ -5,12 +5,11 @@ import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
 import SearchLayout from "../../../components/common/SearchLayout";
-import MoreButton from "../../../components/MoreButton";
 import TrackCard from "../../../components/track/TrackCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../../lib/spotify";
 
 interface SearchTracksProps {

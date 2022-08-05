@@ -13,7 +13,7 @@ interface ArtistPageProps {
 const Artist = (props: ArtistPageProps) => {
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="flex flex-col items-center p-2 border">
+      <div className="flex flex-col items-center p-2">
         <Avatar
           src={
             props.artist.images.length > 0
@@ -64,7 +64,6 @@ const Artist = (props: ArtistPageProps) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const accessToken = await getServerAccessToken();
-
   spotifyApiWrapper.setAccessToken(accessToken);
 
   const artist = await spotifyApiWrapper

@@ -1,10 +1,11 @@
 import {
   Avatar,
   Button,
+  Loading,
   Popover,
   Progress,
   Spacer,
-  Text,
+  Text
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -52,7 +53,7 @@ const NavBar = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black bg-opacity-90 pb-1">
+    <nav className="sticky top-0 z-30 w-full bg-black bg-opacity-90 pb-1">
       <div className="flex flex-col">
         {/* Progress Bar */}
         <div className="w-full mb-0.5">
@@ -75,11 +76,11 @@ const NavBar = () => {
         </div>
 
         <div className="flex w-full px-3">
-          <div className="flex items-center w-1/2 md:w-1/3">
-            <div className="hidden md:inline-block w-full">
+          <div className="flex items-center w-1/2 lg:w-1/3">
+            <div className="hidden lg:inline-block w-full">
               <Logo />
             </div>
-            <div className="inline-block absolute bottom-0 h-full md:hidden w-1/2">
+            <div className="inline-block absolute bottom-0 h-full lg:hidden w-1/2">
               <BurgerMenu>
                 <div className="absolute top-0 left-2 p-0">
                   <Logo />
@@ -90,6 +91,11 @@ const NavBar = () => {
                     <Link href={"/"}>
                       <a>
                         <Text size={20}>Home</Text>
+                      </a>
+                    </Link>
+                    <Link href={"/panel"}>
+                      <a>
+                        <Text size={20}>Panel</Text>
                       </a>
                     </Link>
                     <Link href={"/library/tracks"}>
@@ -103,12 +109,17 @@ const NavBar = () => {
             </div>
           </div>
 
-          <div className="hidden md:inline-block flex items-end w-1/3">
+          <div className="hidden lg:inline-block flex items-end w-1/3">
             <SearchBar bordered />
           </div>
 
-          <div className="flex justify-end items-center w-1/2 md:w-1/3 md:gap-10">
-            <div className="hidden md:inline-block">
+          <div className="flex justify-end items-center w-1/2 lg:w-1/3 lg:gap-10">
+            <div className="hidden lg:flex gap-5">
+              <Link href={"/panel"}>
+                <a>
+                  <Text size={20}>Panel</Text>
+                </a>
+              </Link>
               <Link href={"/library/tracks"}>
                 <a>
                   <Text size={20}>Library</Text>
@@ -145,7 +156,7 @@ const NavBar = () => {
                   </div>
                 </Popover.Content>
               </Popover>
-            ) : (
+            ) : session === null ? (
               <Button
                 auto
                 css={{ p: 20 }}
@@ -154,6 +165,8 @@ const NavBar = () => {
               >
                 <Text size={20}>Login</Text>
               </Button>
+            ) : (
+              <Loading size="md" />
             )}
           </div>
         </div>
@@ -164,7 +177,7 @@ const NavBar = () => {
 
 const Footer = () => {
   return (
-    <div className="w-full z-40 flex justify-center bg-black bg-opacity-90 p-2">
+    <div className="w-full z-30 flex justify-center bg-black bg-opacity-90 p-2">
       <Text>Developed by Ken</Text>
       <Spacer x={0.5} />
       <a

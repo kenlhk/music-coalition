@@ -38,7 +38,6 @@ const Album = (props: AlbumPageProps) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const accessToken = await getServerAccessToken();
-
   spotifyApiWrapper.setAccessToken(accessToken);
 
   const album = await spotifyApiWrapper
