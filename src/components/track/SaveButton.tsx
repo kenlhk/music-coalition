@@ -1,6 +1,6 @@
 import { Button, Text } from "@nextui-org/react";
 import axios from "axios";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { MdDataSaverOff, MdDataSaverOn } from "react-icons/md";
@@ -31,7 +31,7 @@ const SaveButton = () => {
       }
       setSaved(!saved);
     } else {
-      router.push("/auth/login");
+      signIn();
     }
   };
 

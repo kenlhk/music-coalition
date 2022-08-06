@@ -28,7 +28,8 @@ export const authOptions: NextAuthOptions = {
 
           return { name: user.username, email: user.email };
         } catch (error) {
-          throw new Error(error as string);
+          console.log(error);
+          throw new Error("Invalid username/ password");
         }
       },
     }),
@@ -36,13 +37,14 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/auth/login",
+    error: "/auth/login",
   },
 
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      return baseUrl;
+    redirect: async ({ url, baseUrl }) => {
+      return Promise.resolve(url);
     },
   },
 

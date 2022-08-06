@@ -42,23 +42,19 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (form: FormData) => {
+    const callbackURL = router.query.callbackUrl as string;
     const res = await signIn("credentials", {
       username: form.username,
       password: form.password,
-      redirect: false,
+      redirect: true,
+      callbackUrl: callbackURL || "/",
     });
-
-    if (res?.status === 200) {
-      router.push("/");
-    } else {
-      setLoginError("Invalid username/password");
-    }
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col w-full sm:w-96 h-auto p-5 gap-y-1"
+      className="flex flex-col w-full sm:w-96 h-auto p-5 gap-y-2"
     >
       <Controller
         name={"username"}
