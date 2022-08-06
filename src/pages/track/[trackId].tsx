@@ -74,7 +74,7 @@ const Track = (props: TrackPageProps) => {
     const res = await axios.get("/api/track/lyrics", {
       params: {
         track: props.track.name,
-        artists: props.artists.map((artist) => artist.name).join(" "),
+        artist: props.artists.map((artist) => artist.name).join("+"),
       },
     });
     return res.data.lyrics;

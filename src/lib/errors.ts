@@ -1,3 +1,10 @@
+export const BAD_REQUEST = {
+  error: {
+    status: 400,
+    message: "Bad request",
+  },
+};
+
 export const UNAUTHORIZED = {
   error: {
     status: 401,
