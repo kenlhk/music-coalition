@@ -4,6 +4,8 @@ import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 
 interface TrackCardProps {
   track: SpotifyApi.TrackObjectFull;
+  height?: string;
+  width?: string;
 }
 
 const TrackCard = (props: TrackCardProps) => {
@@ -47,8 +49,8 @@ const TrackCard = (props: TrackCardProps) => {
                 src={props.track.album.images[1].url || ""}
                 objectFit="cover"
                 alt="Album cover"
-                height={"180px"}
-                width={"180px"}
+                height={props.height || "180px"}
+                width={props.width || "180px"}
               />
             </Card.Body>
             <Card.Footer

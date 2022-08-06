@@ -208,11 +208,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col justify-between min-h-screen min-w-screen">
       <NavBar />
-      <main className="flex flex-col justify-between flex-grow md:px-8 px-2 pt-2">
-        <div>{children}</div>
-        <Footer />
+      <main className="flex flex-col justify-between flex-grow">
+        <div className="">{children}</div>
         <BackgroundPlayer />
       </main>
+      <Footer />
     </div>
   );
 };
