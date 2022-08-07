@@ -12,7 +12,7 @@ const Document = (props: DocumentProps) => {
       <body>
         <Main />
         <NextScript />
-        <script type="text/javascript" src="/viewport.js" async></script>
+        {/* <script type="text/javascript" src="/viewport.js" async></script> */}
       </body>
     </Html>
   );

@@ -69,7 +69,7 @@ const NavBar = () => {
   });
 
   return (
-    <nav className="sticky top-0 z-30 w-full bg-black bg-opacity-90 pb-1">
+    <nav className="sticky top-0 z-30 w-screen bg-black bg-opacity-90 pb-1 px-1">
       <div className="flex flex-col">
         {/* Progress Bar */}
         <div className="w-full mb-0.5">
@@ -135,7 +135,7 @@ const NavBar = () => {
             <SearchBar bordered />
           </div>
 
-          <div className="flex justify-end items-center w-1/2 lg:w-1/3 lg:gap-10">
+          <div className="sticky flex justify-end items-center w-1/2 lg:w-1/3 lg:gap-10">
             <div className="hidden lg:flex gap-5 lg:items-center">
               <Link href={"/panel"}>
                 <a>
@@ -180,7 +180,7 @@ const NavBar = () => {
                       color={"gradient"}
                       onPress={() => signOut()}
                     >
-                      <Text size={20}>Log Out</Text>
+                      <Text size={18}>Log Out</Text>
                     </Button>
                   </div>
                 </Popover.Content>
@@ -192,7 +192,7 @@ const NavBar = () => {
                 color={"gradient"}
                 onPress={() => signIn()}
               >
-                <Text size={20}>Login</Text>
+                <Text size={18}>Login</Text>
               </Button>
             ) : (
               <Loading size="md" />
@@ -206,12 +206,12 @@ const NavBar = () => {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div className="flex flex-col justify-between min-h-screen min-w-screen">
+    <div className="flex flex-col justify-between align-center min-h-screen min-w-screen">
       <NavBar />
-      <main className="flex flex-col justify-between flex-grow">
-        <div className="">{children}</div>
-        <BackgroundPlayer />
+      <main className="flex flex-col justify-between align-center flex-grow px-5">
+        {children}
       </main>
+      <BackgroundPlayer />
       <Footer />
     </div>
   );

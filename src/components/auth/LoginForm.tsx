@@ -54,7 +54,7 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col w-full sm:w-96 h-auto p-5 gap-y-2"
+      className="flex flex-col w-full max-w-sm h-auto gap-y-1"
     >
       <Controller
         name={"username"}

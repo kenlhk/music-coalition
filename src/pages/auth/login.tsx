@@ -1,6 +1,7 @@
 import { Text } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Script from "next/script";
 import LoginForm from "../../components/auth/LoginForm";
 
 const Login = () => {
@@ -8,7 +9,7 @@ const Login = () => {
   const { error } = router.query;
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center pt-10 md:pt-16 absolute left-0">
+    <div className="flex flex-col items-center py-24">
       <Text h2 className="max-w-md">
         Log In
       </Text>

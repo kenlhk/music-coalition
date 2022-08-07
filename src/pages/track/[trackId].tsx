@@ -1,6 +1,7 @@
 import { Avatar, Grid, Loading, Modal, Text, Tooltip } from "@nextui-org/react";
 import axios from "axios";
 import { GetServerSideProps } from "next";
+import { unstable_getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify,
+  BsSpotify
 } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
@@ -19,16 +20,18 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "../../components/Tabs";
 import SaveButton from "../../components/track/SaveButton";
 import VideoCard from "../../components/VideoCard";
 import {
   getServerAccessToken,
   spotifyApiWrapper,
-  spotifyAxiosClient,
+  spotifyAxiosClient
 } from "../../lib/spotify";
+import { getSavedTracks } from "../../lib/user";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -144,18 +147,29 @@ const Track = (props: TrackPageProps) => {
 
       <div className="flex justify-center w-full">
         {props.album.images[1] ? (
-          <Image
-            src={props.album.images[0].url}
-            height={300}
-            width={300}
-            alt="Cover"
-          />
+          <Link
+            href={{
+              pathname: "/album/[albumId]",
+              query: {
+                albumId: props.album.id,
+              },
+            }}
+          >
+            <a>
+              <Image
+                src={props.album.images[0].url}
+                height={300}
+                width={300}
+                alt="Cover"
+              />
+            </a>
+          </Link>
         ) : (
           <p>No Album Cover</p>
         )}
       </div>
       <div className="flex justify-center">
-        <SaveButton />
+        <SaveButton saved={props.saved} />
       </div>
       <div className="flex justify-center">
         <Tabs defaultValue="tab1" className="max-w-6xl">
@@ -187,7 +201,7 @@ const Track = (props: TrackPageProps) => {
                 )}
               </div>
               <div className="flex flex-col items-center">
-                <Text h4>Play full song on:</Text>
+                <Text h4>Available on:</Text>
                 <div className="flex justify-center gap-x-10 w-full">
                   {props.track.external_urls.spotify && (
                     <a
@@ -248,10 +262,11 @@ const Track = (props: TrackPageProps) => {
         open={visible}
         onClose={handleVideoModalClose}
         blur
-        width="1000px"
         closeButton
+        width="1000px"
+        css={{ aspectRatio: "16/9" }}
       >
-        <Modal.Body css={{ height: "75vh", pt: 30 }}>
+        <Modal.Body css={{ pt: "2%" }}>
           <ReactPlayer
             url={videoLink}
             config={{ youtube: { playerVars: { controls: 1 } } }}
@@ -265,12 +280,20 @@ const Track = (props: TrackPageProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+
   const accessToken = await getServerAccessToken();
 
   spotifyApiWrapper.setAccessToken(accessToken);
 
+  const trackId = context.query.trackId as string;
+
   const track = await spotifyApiWrapper
-    .getTrack(context.query.trackId as string)
+    .getTrack(trackId)
     .then((res) => res.body);
 
   const artists = await Promise.all(
@@ -303,18 +326,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${track.name} ${artistsQueryString}`
   );
 
-  // Fetch lyrics from Genius
-  // const client = new Genius.Client();
-  // let lyrics;
-  // try {
-  //   const searches = await client.songs.search(
-  //     `${track.name} ${artistsQueryString}`
-  //   );
-  //   const firstSong = searches[0];
-  //   lyrics = await firstSong.lyrics();
-  // } catch (error) {
-  //   (error: Error) => console.log(error);
-  // }
+  // Check if track is saved
+  let saved = false;
+  if (session) {
+    const res = await getSavedTracks(session.user?.name!);
+    saved = res.includes(trackId);
+  }
 
   return {
     props: {
@@ -322,8 +339,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       artists: artists,
       album: track.album,
       videos: videos || null,
-      // lyrics: lyrics || null,
       itunesURL: itunesURL,
+      saved: saved,
     },
   };
 };

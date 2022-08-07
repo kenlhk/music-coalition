@@ -8,7 +8,6 @@ interface CoverParallaxProps {
   sampleTracks?: SpotifyApi.TrackObjectFull[];
 }
 
-// Little helpers ...
 const url = (name: string, wrap = false) =>
   `${
     wrap ? "url(" : ""
@@ -19,11 +18,18 @@ const url = (name: string, wrap = false) =>
 const CoverParallax = (props: CoverParallaxProps) => {
   const parallax = useRef<IParallax>(null!);
   return (
-    <div style={{ width: "100%", height: "100%", background: "#253237" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "#253237",
+        zIndex: "0",
+      }}
+    >
       <Parallax
         ref={parallax}
         pages={3}
-        style={{ width: "100vw", position: "absolute", top: 0 }}
+        style={{ width: "100vw", position: "absolute", top: 0, left: 0 }}
       >
         <ParallaxLayer
           offset={1}
@@ -35,7 +41,6 @@ const CoverParallax = (props: CoverParallaxProps) => {
           speed={1}
           style={{ backgroundColor: "#000000" }}
         />
-
         <ParallaxLayer
           offset={0}
           speed={0}
@@ -130,16 +135,6 @@ const CoverParallax = (props: CoverParallaxProps) => {
         </ParallaxLayer>
 
         <ParallaxLayer
-          offset={2}
-          speed={-0.3}
-          style={{
-            backgroundSize: "80%",
-            backgroundPosition: "center",
-            // backgroundImage: url("clients", true),
-          }}
-        />
-
-        <ParallaxLayer
           offset={-0.001}
           speed={0.1}
           onClick={() => parallax.current.scrollTo(1)}
@@ -179,12 +174,14 @@ const CoverParallax = (props: CoverParallaxProps) => {
           }}
         >
           <div>
-            <img src="/Panel_Page.png" style={{ width: "60vw" }} />
+            <img
+              src="/Panel_Page.png"
+              style={{ width: "60vw", minWidth: "300px" }}
+            />
             <Text
               span
               css={{
-                // textGradient: "45deg, $blue600 -20%, $pink600 50%",
-                fontSize: "2vw",
+                fontSize: "2vmax",
               }}
               weight={"bold"}
             >
@@ -192,8 +189,6 @@ const CoverParallax = (props: CoverParallaxProps) => {
             </Text>
           </div>
         </ParallaxLayer>
-
-        {/* Sample tracks */}
 
         <ParallaxLayer
           offset={2}
@@ -231,8 +226,7 @@ const CoverParallax = (props: CoverParallaxProps) => {
               <Text
                 span
                 css={{
-                  // textGradient: "45deg, $blue600 -20%, $pink600 50%",
-                  fontSize: "2.5vw",
+                  fontSize: "2.5vmax",
                 }}
                 weight={"bold"}
               >

@@ -2,25 +2,18 @@ import { Button, Text } from "@nextui-org/react";
 import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MdDataSaverOff, MdDataSaverOn } from "react-icons/md";
 
-const SaveButton = () => {
-  const [saved, setSaved] = useState(false);
+interface SaveButtonProps {
+  saved?: boolean | false;
+}
+
+const SaveButton = (props: SaveButtonProps) => {
+  const [saved, setSaved] = useState(props.saved);
   const router = useRouter();
   const trackId = router.query.trackId;
   const session = useSession();
-
-  useEffect(() => {
-    const checkSaved = async () => {
-      const res = await axios.get("/api/user/tracks");
-      const savedTracks = res.data;
-      setSaved(savedTracks.includes(trackId));
-    };
-    if (session.status === "authenticated") {
-      checkSaved();
-    }
-  }, [trackId, session.status]);
 
   const handleSave = async () => {
     if (session.status === "authenticated") {

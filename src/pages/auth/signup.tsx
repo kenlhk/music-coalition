@@ -3,7 +3,7 @@ import SignUpForm from "../../components/auth/SignUpForm";
 
 const Signup = () => {
   return (
-    <div className="w-screen h-screen flex flex-col items-center pt-10 md:pt-16 absolute left-0">
+    <div className="flex flex-col items-center py-16">
       <Text h2 className="max-w-md">
         Sign Up
       </Text>
