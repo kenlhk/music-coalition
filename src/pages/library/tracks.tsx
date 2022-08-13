@@ -1,34 +1,54 @@
-import { Grid, Text } from "@nextui-org/react";
+import { Grid, Spacer, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import { unstable_getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import TrackCard from "../../components/track/TrackCard";
-import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
-import { getSavedTracks } from "../../lib/user";
+import { getRating } from "../../lib/db/services/rate";
+import { spotifyApiWrapper } from "../../lib/spotify";
 import { authOptions } from "../api/auth/[...nextauth]";
 
 interface TrackLibraryProps {
-  tracks: SpotifyApi.TrackObjectFull[];
+  likedTracks: SpotifyApi.TrackObjectFull[];
+  dislikedTracks: SpotifyApi.TrackObjectFull[];
 }
 
 const TrackLibrary = (props: TrackLibraryProps) => {
   const session = useSession();
   return (
     <div>
-      <Text h3>Saved Tracks:</Text>
-      {session.status === "unauthenticated" ? (
-        <Text>Please login to view your saved tracks.</Text>
-      ) : props.tracks.length > 0 ? (
-        <Grid.Container gap={1}>
-          {props.tracks.map((track, index) => (
-            <Grid key={index}>
-              <TrackCard track={track} />
-            </Grid>
-          ))}
-        </Grid.Container>
-      ) : (
-        <Text>No saved tracks.</Text>
-      )}
+      <div>
+        <Text h3 color="success">
+          Liked Tracks:
+        </Text>
+        {props.likedTracks.length > 0 ? (
+          <Grid.Container gap={1}>
+            {props.likedTracks.map((track, index) => (
+              <Grid key={index}>
+                <TrackCard track={track} />
+              </Grid>
+            ))}
+          </Grid.Container>
+        ) : (
+          <Text>No liked track.</Text>
+        )}
+      </div>
+      <Spacer />
+      <div>
+        <Text h3 color="error">
+          Disliked Tracks:
+        </Text>
+        {props.dislikedTracks.length > 0 ? (
+          <Grid.Container gap={1}>
+            {props.dislikedTracks.map((track, index) => (
+              <Grid key={index}>
+                <TrackCard track={track} />
+              </Grid>
+            ))}
+          </Grid.Container>
+        ) : (
+          <Text>No liked track.</Text>
+        )}
+      </div>
     </div>
   );
 };
@@ -39,22 +59,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     context.res,
     authOptions
   );
-  const accessToken = await getServerAccessToken();
-  spotifyApiWrapper.setAccessToken(accessToken);
+  const client = await spotifyApiWrapper();
+  const rates = await getRating(session!.user!.name!);
 
-  const savedTracks = await getSavedTracks(session?.user?.name || "");
+  let likedTracks: SpotifyApi.TrackObjectFull[] = [];
+  let dislikedTracks: SpotifyApi.TrackObjectFull[] = [];
 
-  let tracks: SpotifyApi.TrackObjectFull[] = [];
+  const likedTrackIds = rates
+    .filter((rate) => rate.sourceType === "Track" && rate.rating === "Like")
+    .map((rate) => rate.source);
 
-  while (savedTracks.length) {
-    const ids = savedTracks.splice(0, 50);
-    const res = await spotifyApiWrapper.getTracks(ids);
-    res.body.tracks.map((track) => tracks.push(track));
+  const dislikedTrackIds = rates
+    .filter((rate) => rate.sourceType === "Track" && rate.rating === "Dislike")
+    .map((rate) => rate.source);
+
+  if (likedTrackIds.length > 0) {
+    const likedTracksRes = await client.getTracks(likedTrackIds);
+    likedTracks = likedTracksRes.body.tracks;
+  }
+
+  if (dislikedTrackIds.length > 0) {
+    const dislikedTracksRes = await client.getTracks(dislikedTrackIds);
+    dislikedTracks = dislikedTracksRes.body.tracks;
   }
 
   return {
     props: {
-      tracks: tracks,
+      likedTracks: likedTracks,
+      dislikedTracks: dislikedTracks,
     },
   };
 };

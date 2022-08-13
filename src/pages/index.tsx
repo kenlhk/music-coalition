@@ -13,11 +13,9 @@ const Home = (props: HomeProps) => {
 export default Home;
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const accessToken = await getServerAccessToken();
+  const client = await spotifyApiWrapper();
 
-  spotifyApiWrapper.setAccessToken(accessToken);
-
-  const res = await spotifyApiWrapper.getTracks([
+  const res = await client.getTracks([
     "3S4px9f4lceWdKf0gWciFu",
     "1zwMYTA5nlNjZxYrvBB2pV",
     "4LRPiXqCikLlN15c3yImP7",

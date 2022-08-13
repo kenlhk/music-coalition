@@ -1,10 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { hashPassword } from "../../../lib/auth";
+import { NextApiHandler } from "next";
+import { createUser, getUserByUsername } from "../../../lib/db/services/user";
 import { METHOD_NOT_ALLOWED } from "../../../lib/errors";
-import clientPromise from "../../../lib/mongodb";
-import { getUser } from "../../../lib/user";
 
-const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const signupHandler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
     const {
       username,
@@ -16,25 +14,17 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       password: string;
     } = req.body;
 
-    const client = await clientPromise;
-
-    const existingUser = await getUser(username);
+    const existingUser = await getUserByUsername(username);
 
     if (existingUser) {
       return res.status(422).json({ message: "User is already registered." });
     }
 
-    const newUser = {
-      username: username,
-      email: email,
-      password: await hashPassword(password),
-    };
-
-    const result = await client.db().collection("users").insertOne(newUser);
+    const result = await createUser(username, email, password);
 
     return res.status(201).json({
       message: "Created user!",
-      data: { ...newUser, _id: result.insertedId.toString() },
+      data: { ...result, _id: result._id },
     });
   }
 

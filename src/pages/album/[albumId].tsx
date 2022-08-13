@@ -2,14 +2,14 @@ import { Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
+import { saveAlbum } from "../../lib/db/services/album";
+import { spotifyApiWrapper } from "../../lib/spotify";
 
 const AlbumTable = dynamic(() => import("../../components/album/AlbumTable"), {
   ssr: false,
 });
 
 interface AlbumPageProps {
-  accessToken: string;
   album: SpotifyApi.AlbumObjectFull;
 }
 
@@ -37,16 +37,14 @@ const Album = (props: AlbumPageProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await getServerAccessToken();
-  spotifyApiWrapper.setAccessToken(accessToken);
+  const client = await spotifyApiWrapper();
 
-  const album = await spotifyApiWrapper
-    .getAlbum(context.query.albumId as string)
-    .then((res) => res.body);
+  const albumRes = await client.getAlbum(context.query.albumId as string);
+  const album = albumRes.body;
+  await saveAlbum(album);
 
   return {
     props: {
-      accessToken: accessToken,
       album: album,
     },
   };

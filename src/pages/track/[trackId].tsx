@@ -11,25 +11,23 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify
+  BsSpotify,
 } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
+import LikeButtons from "../../components/LikeButtons";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "../../components/Tabs";
-import SaveButton from "../../components/track/SaveButton";
 import VideoCard from "../../components/VideoCard";
-import {
-  getServerAccessToken,
-  spotifyApiWrapper,
-  spotifyAxiosClient
-} from "../../lib/spotify";
-import { getSavedTracks } from "../../lib/user";
+import { saveArtist } from "../../lib/db/services/artist";
+import { getRating } from "../../lib/db/services/rate";
+import { saveTrack } from "../../lib/db/services/track";
+import { spotifyApiWrapper } from "../../lib/spotify";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 import { authOptions } from "../api/auth/[...nextauth]";
 
@@ -42,7 +40,7 @@ interface TrackPageProps {
   videos?: Youtube.Video[];
   lyrics?: string;
   itunesURL?: string;
-  saved?: boolean;
+  rating?: string;
 }
 
 const Track = (props: TrackPageProps) => {
@@ -144,7 +142,6 @@ const Track = (props: TrackPageProps) => {
           </Avatar.Group>
         </div>
       </div>
-
       <div className="flex justify-center w-full">
         {props.album.images[1] ? (
           <Link
@@ -169,19 +166,23 @@ const Track = (props: TrackPageProps) => {
         )}
       </div>
       <div className="flex justify-center">
-        <SaveButton saved={props.saved} />
+        <LikeButtons
+          sourceType="Track"
+          sourceId={props.track.id}
+          rating={props.rating}
+        />
       </div>
       <div className="flex justify-center">
         <Tabs defaultValue="tab1" className="max-w-6xl">
           <TabsList>
             <TabsTrigger value="tab1">
-              <Text h4>Details</Text>
+              <Text h5>Details</Text>
             </TabsTrigger>
             <TabsTrigger value="tab2">
-              <Text h4>Videos</Text>
+              <Text h5>Videos</Text>
             </TabsTrigger>
             <TabsTrigger value="tab3">
-              <Text h4>Lyrics</Text>
+              <Text h5>Lyrics</Text>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
@@ -286,27 +287,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     authOptions
   );
 
-  const accessToken = await getServerAccessToken();
-
-  spotifyApiWrapper.setAccessToken(accessToken);
-
   const trackId = context.query.trackId as string;
+  const client = await spotifyApiWrapper();
+  const track = await client.getTrack(trackId).then((res) => res.body);
+  await saveTrack(track);
 
-  const track = await spotifyApiWrapper
-    .getTrack(trackId)
-    .then((res) => res.body);
-
-  const artists = await Promise.all(
-    track.artists.map(async (artist) => {
-      const res = await spotifyAxiosClient.get(artist.href, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      return res.data;
+  // Fetch the artists
+  const res = await client.getArtists(
+    track.artists.map((artist) => {
+      return artist.id;
     })
   );
-
+  const artists = res.body.artists;
+  artists.map(async (artist) => await saveArtist(artist));
   const artistsQueryString = artists.map((artist) => artist.name).join(" ");
 
   // Fetch the track in iTunes
@@ -326,11 +319,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${track.name} ${artistsQueryString}`
   );
 
-  // Check if track is saved
-  let saved = false;
-  if (session) {
-    const res = await getSavedTracks(session.user?.name!);
-    saved = res.includes(trackId);
+  // Check the rating
+  const rates = await getRating(session!.user!.name!);
+  const trackRate = rates.filter((rate) => rate.source === trackId);
+  let rating = "";
+  if (trackRate.length > 0) {
+    rating = trackRate[0].rating;
+  } else {
+    rating = "None";
   }
 
   return {
@@ -340,7 +336,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       album: track.album,
       videos: videos || null,
       itunesURL: itunesURL,
-      saved: saved,
+      rating: rating,
     },
   };
 };

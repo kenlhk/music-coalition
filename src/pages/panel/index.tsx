@@ -8,6 +8,7 @@ import { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import SpotifyWebApi from "spotify-web-api-node";
 import shallow from "zustand/shallow";
 import TrackCard from "../../components/track/TrackCard";
 import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
@@ -31,11 +32,12 @@ const Panel = (props: PanelProps) => {
   const attributes = usePanelStore((state) => state, shallow);
   const [expanded, setExpanded] = useState(false);
 
-  spotifyApiWrapper.setAccessToken(props.accessToken);
+  const client = new SpotifyWebApi();
+  client.setAccessToken(props.accessToken);
 
   const fetcher = async () => {
     if (attributes.genre) {
-      const res = await spotifyApiWrapper.getRecommendations({
+      const res = await client.getRecommendations({
         seed_genres: [attributes.genre],
         min_acousticness: attributes.acousticness / 100,
         min_danceability: attributes.danceability / 100,
@@ -142,15 +144,16 @@ const Panel = (props: PanelProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await getServerAccessToken();
-  spotifyApiWrapper.setAccessToken(accessToken);
+  const token = await getServerAccessToken();
+  const client = await spotifyApiWrapper();
+  client.setAccessToken(token.access_token);
 
-  const genres = await spotifyApiWrapper.getAvailableGenreSeeds();
+  const genres = await client.getAvailableGenreSeeds();
 
   return {
     props: {
       genres: genres.body.genres,
-      accessToken: accessToken,
+      accessToken: token.access_token,
     },
   };
 };

@@ -4,13 +4,10 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
+import SpotifyWebApi from "spotify-web-api-node";
 import AlbumCard from "../../../components/album/AlbumCard";
 import SearchLayout from "../../../components/common/SearchLayout";
-import {
-  getServerAccessToken,
-  spotifyApiWrapper,
-  spotifyAxiosClient,
-} from "../../../lib/spotify";
+import { getServerAccessToken, spotifyAxiosClient } from "../../../lib/spotify";
 
 interface SearchAlbumProps {
   accessToken: string;
@@ -21,10 +18,10 @@ const AlbumSearch = (props: SearchAlbumProps) => {
   const prompt = router.query.prompt;
   const [albums, setAlbums] = useState<SpotifyApi.AlbumObjectFull[]>([]);
   const accessToken = props.accessToken;
+  const client = new SpotifyWebApi();
+  client.setAccessToken(accessToken);
 
   const fetcher = async ({ pageParam = "" }) => {
-    spotifyApiWrapper.setAccessToken(accessToken);
-
     if (pageParam !== "") {
       const res = await spotifyAxiosClient
         .get(pageParam, {
@@ -36,7 +33,7 @@ const AlbumSearch = (props: SearchAlbumProps) => {
       return res;
     }
 
-    const res = await spotifyApiWrapper
+    const res = await client
       .search(prompt as string, ["album"], { limit: 30 })
       .then((res) => res.body.albums);
 
@@ -110,11 +107,11 @@ AlbumSearch.getLayout = function getLayout(page: ReactNode) {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await getServerAccessToken();
+  const token = await getServerAccessToken();
 
   return {
     props: {
-      accessToken: accessToken,
+      accessToken: token.access_token,
     },
   };
 };

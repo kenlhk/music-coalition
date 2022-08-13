@@ -4,13 +4,10 @@ import { useRouter } from "next/router";
 import React, { ReactNode, useMemo, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { VirtuosoGrid } from "react-virtuoso";
+import SpotifyWebApi from "spotify-web-api-node";
 import SearchLayout from "../../../components/common/SearchLayout";
 import TrackCard from "../../../components/track/TrackCard";
-import {
-  getServerAccessToken,
-  spotifyApiWrapper,
-  spotifyAxiosClient,
-} from "../../../lib/spotify";
+import { getServerAccessToken, spotifyAxiosClient } from "../../../lib/spotify";
 
 interface SearchTracksProps {
   accessToken: string;
@@ -22,10 +19,10 @@ const TrackSearch = (props: SearchTracksProps) => {
   const prompt = router.query.prompt;
   const [tracks, setTracks] = useState<SpotifyApi.TrackObjectFull[]>([]);
   const accessToken = props.accessToken;
+  const client = new SpotifyWebApi();
+  client.setAccessToken(accessToken);
 
   const fetcher = async ({ pageParam = "" }) => {
-    spotifyApiWrapper.setAccessToken(accessToken);
-
     if (pageParam !== "") {
       const res = await spotifyAxiosClient
         .get(pageParam, {
@@ -37,7 +34,7 @@ const TrackSearch = (props: SearchTracksProps) => {
       return res;
     }
 
-    const res = await spotifyApiWrapper
+    const res = await client
       .search(prompt as string, ["track"], { limit: 30 })
       .then((res) => res.body.tracks);
 
@@ -108,11 +105,11 @@ TrackSearch.getLayout = function getLayout(page: ReactNode) {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await getServerAccessToken();
+  const token = await getServerAccessToken();
 
   return {
     props: {
-      accessToken: accessToken,
+      accessToken: token.access_token,
     },
   };
 };

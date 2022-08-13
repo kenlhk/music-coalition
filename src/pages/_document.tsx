@@ -13,6 +13,7 @@ const Document = (props: DocumentProps) => {
         <Main />
         <NextScript />
         {/* <script type="text/javascript" src="/viewport.js" async></script> */}
+        {/* <script src="https://sdk.scdn.co/spotify-player.js"></script> */}
       </body>
     </Html>
   );

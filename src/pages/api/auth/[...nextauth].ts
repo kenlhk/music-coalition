@@ -1,7 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { verifyPassword } from "../../../lib/auth";
-import clientPromise from "../../../lib/mongodb";
+import { getUserByUsername } from "../../../lib/db/services/user";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,19 +11,15 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         try {
-          const client = await clientPromise;
-          const user = await client.db().collection("users").findOne({
-            username: credentials?.username,
-          });
+          const user = await getUserByUsername(credentials!.username);
 
           if (!user) throw new Error("No user found");
 
-          const isPasswordValid = await verifyPassword(
-            credentials!.password,
-            user.password
+          const isValidPassword = await user.verifyPassword(
+            credentials!.password
           );
 
-          if (!isPasswordValid) throw new Error("Password is not valid");
+          if (!isValidPassword) throw new Error("Password is not valid");
 
           return { name: user.username, email: user.email };
         } catch (error) {

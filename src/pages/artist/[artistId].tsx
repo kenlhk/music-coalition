@@ -2,7 +2,8 @@ import { Avatar, Grid, Text } from "@nextui-org/react";
 import { GetServerSideProps } from "next";
 import ArtistCard from "../../components/artist/ArtistCard";
 import TrackCard from "../../components/track/TrackCard";
-import { getServerAccessToken, spotifyApiWrapper } from "../../lib/spotify";
+import { saveArtist } from "../../lib/db/services/artist";
+import { spotifyApiWrapper } from "../../lib/spotify";
 
 interface ArtistPageProps {
   artist: SpotifyApi.ArtistObjectFull;
@@ -58,25 +59,27 @@ const Artist = (props: ArtistPageProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const accessToken = await getServerAccessToken();
-  spotifyApiWrapper.setAccessToken(accessToken);
+  const client = await spotifyApiWrapper();
 
-  const artist = await spotifyApiWrapper
-    .getArtist(context.query.artistId as string)
-    .then((res) => res.body);
+  const artistRes = await client.getArtist(context.query.artistId as string);
+  const artist = artistRes.body;
+  await saveArtist(artist);
 
-  const topTracks = await spotifyApiWrapper
-    .getArtistTopTracks(context.query.artistId as string, "GB")
-    .then((res) => res.body.tracks);
+  const tracksRes = await client.getArtistTopTracks(
+    context.query.artistId as string,
+    "GB"
+  );
+  const tracks = tracksRes.body.tracks;
 
-  const relatedArtists = await spotifyApiWrapper
-    .getArtistRelatedArtists(context.query.artistId as string)
-    .then((res) => res.body.artists);
+  const relatedArtistsRes = await client.getArtistRelatedArtists(
+    context.query.artistId as string
+  );
+  const relatedArtists = relatedArtistsRes.body.artists;
 
   return {
     props: {
       artist: artist,
-      topTracks: topTracks,
+      topTracks: tracks,
       relatedArtists: relatedArtists,
     },
   };

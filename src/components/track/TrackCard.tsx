@@ -3,19 +3,24 @@ import Link from "next/link";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 
 interface TrackCardProps {
-  track: SpotifyApi.TrackObjectFull;
+  track?: SpotifyApi.TrackObjectFull;
+  trackId?: string;
+  name?: string;
+  artistNames?: string[];
+  albumCover?: string;
+  previewUrl?: string;
   height?: string;
   width?: string;
 }
 
 const TrackCard = (props: TrackCardProps) => {
-  const artists = props.track.artists.map((artist) => artist.name).join(", ");
+  const artists = props.track?.artists.map((artist) => artist.name).join(", ");
   const { auto, setUrl, setPlaying } = useBackgroundPlayerStore();
 
   const handleMouseEnter = () => {
     if (auto) {
       setPlaying(true);
-      setUrl(props.track.preview_url);
+      setUrl(props.track?.preview_url || props.previewUrl || "");
     }
   };
 
@@ -32,7 +37,7 @@ const TrackCard = (props: TrackCardProps) => {
         href={{
           pathname: "/track/[trackId]",
           query: {
-            trackId: props.track.id,
+            trackId: props.track?.id || props.trackId,
           },
         }}
       >
@@ -46,7 +51,9 @@ const TrackCard = (props: TrackCardProps) => {
           >
             <Card.Body css={{ p: 0 }}>
               <Card.Image
-                src={props.track.album.images[1].url || ""}
+                src={
+                  props.track?.album?.images[1]?.url || props.albumCover || ""
+                }
                 objectFit="cover"
                 alt="Album cover"
                 height={props.height || "180px"}
@@ -72,10 +79,10 @@ const TrackCard = (props: TrackCardProps) => {
                     color="#FFF"
                     size={"80%"}
                   >
-                    {props.track.name}
+                    {props.track?.name || props.name}
                   </Text>
                   <Text className="truncate" color="#FFF" size={"70%"}>
-                    {artists}
+                    {artists || props.artistNames}
                   </Text>
                 </Col>
               </Row>
