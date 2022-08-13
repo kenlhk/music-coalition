@@ -6,7 +6,7 @@ import {
   Progress,
   Switch,
   Text,
-  Tooltip,
+  Tooltip
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -47,7 +47,9 @@ const AutoSwitch = () => {
     <Switch
       initialChecked={auto}
       checked={auto}
-      onChange={(en) => setAuto(en.target.checked)}
+      onChange={(en) => {
+        setAuto(en.target.checked);
+      }}
       icon={<BsPlayFill />}
     />
   );
@@ -56,6 +58,7 @@ const AutoSwitch = () => {
 const NavBar = () => {
   const { data: session, status } = useSession();
   const { isLoading, setLoading } = useLoadingStore();
+  const { setPlaying, setUrl } = useBackgroundPlayerStore();
   const { setOpen } = useBurgerMenuStore();
   const router = useRouter();
 
@@ -66,6 +69,8 @@ const NavBar = () => {
 
   Router.events.on("routeChangeComplete", () => {
     setLoading(false);
+    setPlaying(false);
+    setUrl("");
   });
 
   return (
@@ -159,7 +164,7 @@ const NavBar = () => {
             {status === "authenticated" ? (
               <Popover>
                 <Popover.Trigger>
-                  <div className="flex items-center gap-2 cursor-pointer">
+                  <div className="flex items-center gap-2 cursor-pointer pr-2">
                     <Avatar
                       src={session?.user?.image || "/Avatar_Placeholder.png"}
                       size="lg"
