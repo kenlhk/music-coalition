@@ -11,7 +11,7 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify,
+  BsSpotify
 } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
@@ -21,7 +21,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import { saveArtist } from "../../lib/db/services/artist";
@@ -319,14 +319,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     `${track.name} ${artistsQueryString}`
   );
 
+  let rating = "None";
   // Check the rating
-  const rates = await getRating(session!.user!.name!);
-  const trackRate = rates.filter((rate) => rate.source === trackId);
-  let rating = "";
-  if (trackRate.length > 0) {
-    rating = trackRate[0].rating;
-  } else {
-    rating = "None";
+  if (session) {
+    const rates = await getRating(session.user!.name!);
+    const trackRate = rates.filter((rate) => rate.source === trackId);
+    if (trackRate.length > 0) {
+      rating = trackRate[0].rating;
+    }
   }
 
   return {

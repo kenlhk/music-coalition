@@ -59,28 +59,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     context.res,
     authOptions
   );
-  const client = await spotifyApiWrapper();
-  const rates = await getRating(session!.user!.name!);
 
   let likedTracks: SpotifyApi.TrackObjectFull[] = [];
   let dislikedTracks: SpotifyApi.TrackObjectFull[] = [];
 
-  const likedTrackIds = rates
-    .filter((rate) => rate.sourceType === "Track" && rate.rating === "Like")
-    .map((rate) => rate.source);
+  if (session) {
+    const client = await spotifyApiWrapper();
+    const rates = await getRating(session.user!.name!);
 
-  const dislikedTrackIds = rates
-    .filter((rate) => rate.sourceType === "Track" && rate.rating === "Dislike")
-    .map((rate) => rate.source);
+    const likedTrackIds = rates
+      .filter((rate) => rate.sourceType === "Track" && rate.rating === "Like")
+      .map((rate) => rate.source);
 
-  if (likedTrackIds.length > 0) {
-    const likedTracksRes = await client.getTracks(likedTrackIds);
-    likedTracks = likedTracksRes.body.tracks;
-  }
+    const dislikedTrackIds = rates
+      .filter(
+        (rate) => rate.sourceType === "Track" && rate.rating === "Dislike"
+      )
+      .map((rate) => rate.source);
 
-  if (dislikedTrackIds.length > 0) {
-    const dislikedTracksRes = await client.getTracks(dislikedTrackIds);
-    dislikedTracks = dislikedTracksRes.body.tracks;
+    if (likedTrackIds.length > 0) {
+      const likedTracksRes = await client.getTracks(likedTrackIds);
+      likedTracks = likedTracksRes.body.tracks;
+    }
+
+    if (dislikedTrackIds.length > 0) {
+      const dislikedTracksRes = await client.getTracks(dislikedTrackIds);
+      dislikedTracks = dislikedTracksRes.body.tracks;
+    }
   }
 
   return {
