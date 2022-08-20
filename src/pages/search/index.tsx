@@ -1,5 +1,5 @@
-const Search = (props: any) => {
-  return <></>;
+const Search = () => {
+  return <div></div>;
 };
 
 export default Search;

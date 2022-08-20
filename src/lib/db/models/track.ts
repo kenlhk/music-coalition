@@ -1,5 +1,20 @@
 import mongoose from "mongoose";
 
+// export interface TrackType extends Document {
+//   _id: string;
+//   artists: string[];
+//   album: string[];
+//   duration_ms: number;
+//   externalIds: Map<string, string>;
+//   internalUrls: Map<string, string>;
+//   externalUrls: Map<string, string>;
+//   externalApis: Map<string, string>;
+//   name: string;
+//   preview_url: string | null;
+//   popularity: number;
+//   comments: string[];
+// }
+
 const Schema = mongoose.Schema;
 
 const TrackSchema = new mongoose.Schema(
@@ -55,15 +70,3 @@ const TrackSchema = new mongoose.Schema(
 );
 
 export default mongoose.models?.Track || mongoose.model("Track", TrackSchema);
-
-// interface Track extends Document {
-//     artists: string[];
-//     album: string[];
-//     duration_ms: number;
-//     external_ids: Record<string, string>[];
-//     external_urls: Record<string, string>[];
-//     external_apis: Record<string, string>[];
-//     name: string;
-//     preview_url: string | null;
-//     popularity: number
-//   }

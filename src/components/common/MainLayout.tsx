@@ -6,7 +6,7 @@ import {
   Progress,
   Switch,
   Text,
-  Tooltip
+  Tooltip,
 } from "@nextui-org/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";

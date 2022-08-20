@@ -46,7 +46,7 @@ const TrackLibrary = (props: TrackLibraryProps) => {
             ))}
           </Grid.Container>
         ) : (
-          <Text>No liked track.</Text>
+          <Text>No disliked track.</Text>
         )}
       </div>
     </div>

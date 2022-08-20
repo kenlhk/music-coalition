@@ -22,3 +22,30 @@ export const createUser = async (
   });
   return user;
 };
+
+export const saveRefreshToken = async (
+  username: string,
+  provider: string,
+  refreshToken: string
+): Promise<any> => {
+  await connectToDb();
+  const map = new Map();
+  map.set(provider, refreshToken);
+  const user = await User.findOneAndUpdate(
+    { username },
+    {
+      refreshTokens: map,
+    },
+    { upsert: true }
+  );
+  return user;
+};
+
+export const getRefreshToken = async (
+  username: string,
+  provider: string
+): Promise<string> => {
+  await connectToDb();
+  const existingUser = await User.findOne({ username });
+  return existingUser.refreshTokens.get(provider);
+};

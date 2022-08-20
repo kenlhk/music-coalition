@@ -1,6 +1,6 @@
 import { NextApiHandler } from "next";
 import { unstable_getServerSession } from "next-auth";
-import { getRating, rate } from "../../../lib/db/services/rate";
+import { rate } from "../../../lib/db/services/rate";
 import { UNAUTHORIZED } from "../../../lib/errors";
 import { authOptions } from "../auth/[...nextauth]";
 

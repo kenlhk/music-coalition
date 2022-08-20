@@ -6,22 +6,23 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { ItunesSearchOptions, searchItunes } from "node-itunes-search";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify
+  BsSpotify,
 } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
+import SpotifyLoginButton from "../../components/auth/SpotifyLoginButton";
 import LikeButtons from "../../components/LikeButtons";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import { saveArtist } from "../../lib/db/services/artist";
@@ -29,9 +30,15 @@ import { getRating } from "../../lib/db/services/rate";
 import { saveTrack } from "../../lib/db/services/track";
 import { spotifyApiWrapper } from "../../lib/spotify";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
+import useSpotifyPlayerStore from "../../stores/useSpotifyPlayerStore";
+import useSpotifyStore from "../../stores/useSpotifyStore";
 import { authOptions } from "../api/auth/[...nextauth]";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+const SpotifyPlayer = dynamic(
+  () => import("../../components/SpotifyPlayer/SpotifyPlayer"),
+  { ssr: false }
+);
 
 interface TrackPageProps {
   track: SpotifyApi.TrackObjectFull;
@@ -46,6 +53,11 @@ interface TrackPageProps {
 const Track = (props: TrackPageProps) => {
   const [videoLink, setVideoLink] = useState("");
   const [visible, setVisible] = useState(false);
+  const { deviceId, setCurrentTrack } = useSpotifyPlayerStore((state) => ({
+    deviceId: state.deviceId,
+    setCurrentTrack: state.setCurrentTrack,
+  }));
+  const accessToken = useSpotifyStore((state) => state.accessToken);
 
   const handlePlayPause = () => {
     setUrl(props.track.preview_url);
@@ -89,6 +101,10 @@ const Track = (props: TrackPageProps) => {
       staleTime: 0,
     }
   );
+
+  useEffect(() => {
+    setCurrentTrack(props.track);
+  }, []);
 
   return (
     <div className="flex flex-col gap-5">
@@ -186,43 +202,58 @@ const Track = (props: TrackPageProps) => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <div className="flex flex-col md:flex-row justify-around gap-5">
-              <div className="flex flex-col items-center">
-                <Text h4>Preview:</Text>
-                {props.track.preview_url ? (
-                  <a onClick={handlePlayPause}>
-                    {playing ? (
-                      <BsPauseCircleFill size={40} />
-                    ) : (
-                      <BsFillPlayCircleFill size={40} />
-                    )}
-                  </a>
-                ) : (
-                  <Text>No preview available.</Text>
-                )}
-              </div>
-              <div className="flex flex-col items-center">
-                <Text h4>Available on:</Text>
-                <div className="flex justify-center gap-x-10 w-full">
-                  {props.track.external_urls.spotify && (
-                    <a
-                      href={props.track.external_urls.spotify}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <BsSpotify size={40} color={"#1DB954"} />
+            <div className="flex flex-col items-center">
+              <div className="flex flex-col md:flex-row justify-around gap-5 w-full">
+                <div className="flex flex-col items-center">
+                  <Text h4>Preview:</Text>
+                  {props.track.preview_url ? (
+                    <a onClick={handlePlayPause}>
+                      {playing ? (
+                        <BsPauseCircleFill size={40} />
+                      ) : (
+                        <BsFillPlayCircleFill size={40} />
+                      )}
                     </a>
-                  )}
-                  {props.itunesURL && (
-                    <a
-                      href={props.itunesURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <BsApple size={40} color={"#A2AAAD"} />
-                    </a>
+                  ) : (
+                    <Text>No preview available.</Text>
                   )}
                 </div>
+
+                <div className="flex flex-col items-center">
+                  <Text h4>Available on:</Text>
+                  <div className="flex justify-center gap-x-10 w-full">
+                    {props.track.external_urls.spotify && (
+                      <a
+                        href={props.track.external_urls.spotify}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <BsSpotify size={40} color={"#1DB954"} />
+                      </a>
+                    )}
+                    {props.itunesURL && (
+                      <a
+                        href={props.itunesURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <BsApple size={40} color={"#A2AAAD"} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col flex-start w-full pt-10 pb-5">
+                <Text h4>Play the full song (Spotity premium users only):</Text>
+                <Text h5 color="error">
+                  * Spotify only allows limited users for this feature under
+                  development mode. Please send your spotify account email to
+                  musiccube@protonmail.com for granting access.{" "}
+                </Text>
+              </div>
+              <div className="flex flex-col gap-5 min-w-[300px] justify-around align-center border border-solid rounded-3xl p-5">
+                <SpotifyLoginButton />
+                <SpotifyPlayer />
               </div>
             </div>
           </TabsContent>

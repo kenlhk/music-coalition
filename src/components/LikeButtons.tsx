@@ -67,7 +67,7 @@ const LikeButtons = (props: LikeButtons) => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 z-0">
       <Button
         color={"success"}
         shadow={rating === "Like"}

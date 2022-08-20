@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { hashPassword, verifyPassword } from "../../auth";
 import { UserRole } from "../constants";
 
-interface User extends Document {
+interface UserType extends Document {
   username: string;
   email: string;
   isEmailVerified: boolean;
@@ -95,11 +95,15 @@ const UserSchema = new mongoose.Schema(
         ref: "Comment",
       },
     ],
+    refreshTokens: {
+      type: Map,
+      of: String,
+    },
   },
   { timestamps: true }
 );
 
-UserSchema.pre<User>("save", async function (next) {
+UserSchema.pre<UserType>("save", async function (next) {
   if (this.password) {
     const hash = await hashPassword(this.password);
 
@@ -109,11 +113,11 @@ UserSchema.pre<User>("save", async function (next) {
 });
 
 UserSchema.methods.verifyPassword = async function (password: string) {
-  const user = this as User;
+  const user = this as UserType;
   const isValid = await verifyPassword(password, user.password);
 
   return isValid;
 };
 
 export default mongoose.models?.User ||
-  mongoose.model<User>("User", UserSchema);
+  mongoose.model<UserType>("User", UserSchema);
