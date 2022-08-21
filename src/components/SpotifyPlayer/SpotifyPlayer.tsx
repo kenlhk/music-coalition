@@ -1,4 +1,5 @@
 import { Text } from "@nextui-org/react";
+import { Router } from "next/router";
 import { useState } from "react";
 import { BsFillPlayCircleFill, BsPauseCircleFill } from "react-icons/bs";
 import shallow from "zustand/shallow";
@@ -28,7 +29,6 @@ const SpotifyPlayer = () => {
         return;
       }
       setPlaybackState(state);
-      console.log(state);
     },
     onError: (error) => {
       setError(error.message);
@@ -57,6 +57,10 @@ const SpotifyPlayer = () => {
 
     player?.togglePlay();
   };
+
+  Router.events.on("routeChangeComplete", () => {
+    player?.pause();
+  });
 
   return (
     <div className="flex flex-col items-center">

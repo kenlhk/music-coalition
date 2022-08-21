@@ -11,12 +11,13 @@ import {
 import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Router, useRouter } from "next/router";
+import { Router } from "next/router";
 import { ReactNode } from "react";
 import { BsPlayFill } from "react-icons/bs";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 import useBurgerMenuStore from "../../stores/useBurgerMenuStore";
 import useLoadingStore from "../../stores/useLoadingStore";
+import useSpotifyPlayerStore from "../../stores/useSpotifyPlayerStore";
 import BackgroundPlayer from "../BackgroundPlayer";
 import Footer from "./Footer";
 
@@ -60,17 +61,21 @@ const NavBar = () => {
   const { isLoading, setLoading } = useLoadingStore();
   const { setPlaying, setUrl } = useBackgroundPlayerStore();
   const { setOpen } = useBurgerMenuStore();
-  const router = useRouter();
+  const { player, setPlaybackState } = useSpotifyPlayerStore();
 
   Router.events.on("routeChangeStart", () => {
     setLoading(true);
     setOpen(false);
+    player?.pause();
+    setPlaybackState(null);
   });
 
   Router.events.on("routeChangeComplete", () => {
     setLoading(false);
     setPlaying(false);
     setUrl("");
+    player?.pause();
+    setPlaybackState(null);
   });
 
   return (

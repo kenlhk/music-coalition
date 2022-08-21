@@ -7,14 +7,14 @@ interface SpotifyPlayerStore {
   setDeviceId: (deviceId: string | undefined) => void;
   currentTrack: SpotifyApi.TrackObjectFull | undefined;
   setCurrentTrack: (track: SpotifyApi.TrackObjectFull) => void;
-  // playbackState: Spotify.PlaybackState | null;
-  // setPlaybackState: (playbackState: Spotify.PlaybackState | null) => void;
+  playbackState: Spotify.PlaybackState | null;
+  setPlaybackState: (playbackState: Spotify.PlaybackState | null) => void;
   isPaused: boolean | undefined;
   setIsPaused: (isPaused: boolean | undefined) => void;
-  // pos: number | undefined;
-  // setPos: (pos: number | undefined) => void;
-  // error: Spotify.Error | undefined;
-  // setError: (error: Spotify.Error | undefined) => void;
+  pos: number | undefined;
+  setPos: (pos: number | undefined) => void;
+  error: Spotify.Error | undefined;
+  setError: (error: Spotify.Error | undefined) => void;
 }
 
 const useSpotifyPlayerStore = create<SpotifyPlayerStore>((set) => ({
@@ -25,14 +25,14 @@ const useSpotifyPlayerStore = create<SpotifyPlayerStore>((set) => ({
   currentTrack: undefined,
   setCurrentTrack: (track) => set(() => ({ currentTrack: track })),
   playbackState: null,
-  // setPlaybackState: (playbackState) =>
-  //   set(() => ({ playbackState: playbackState })),
-  isPaused: false,
+  setPlaybackState: (playbackState) =>
+    set(() => ({ playbackState: playbackState })),
+  isPaused: true,
   setIsPaused: (isPaused) => set(() => ({ isPaused: isPaused })),
-  // pos: 0,
-  // setPos: (pos) => set(() => ({ pos: pos })),
-  // error: undefined,
-  // setError: (error) => set(() => ({ error: error })),
+  pos: 0,
+  setPos: (pos) => set(() => ({ pos: pos })),
+  error: undefined,
+  setError: (error) => set(() => ({ error: error })),
 }));
 
 export default useSpotifyPlayerStore;

@@ -2,6 +2,7 @@ import { Avatar, Grid, Loading, Modal, Text, Tooltip } from "@nextui-org/react";
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import { unstable_getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import { youtube } from "scrape-youtube";
 import Youtube from "scrape-youtube/lib/interface";
 import SpotifyLoginButton from "../../components/auth/SpotifyLoginButton";
 import LikeButtons from "../../components/LikeButtons";
+import Controller from "../../components/SpotifyPlayer/Controller";
 import {
   Tabs,
   TabsContent,
@@ -28,15 +30,15 @@ import VideoCard from "../../components/VideoCard";
 import { saveArtist } from "../../lib/db/services/artist";
 import { getRating } from "../../lib/db/services/rate";
 import { saveTrack } from "../../lib/db/services/track";
+import { getRefreshToken } from "../../lib/db/services/user";
 import { spotifyApiWrapper } from "../../lib/spotify";
 import useBackgroundPlayerStore from "../../stores/useBackgroundPlayerStore";
 import useSpotifyPlayerStore from "../../stores/useSpotifyPlayerStore";
-import useSpotifyStore from "../../stores/useSpotifyStore";
 import { authOptions } from "../api/auth/[...nextauth]";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
-const SpotifyPlayer = dynamic(
-  () => import("../../components/SpotifyPlayer/SpotifyPlayer"),
+const SpotifyPlayerV2 = dynamic(
+  () => import("../../components/SpotifyPlayer/SpotifyPlayerV2"),
   { ssr: false }
 );
 
@@ -48,16 +50,17 @@ interface TrackPageProps {
   lyrics?: string;
   itunesURL?: string;
   rating?: string;
+  accessToken?: string;
 }
 
 const Track = (props: TrackPageProps) => {
   const [videoLink, setVideoLink] = useState("");
   const [visible, setVisible] = useState(false);
-  const { deviceId, setCurrentTrack } = useSpotifyPlayerStore((state) => ({
+  const { setCurrentTrack } = useSpotifyPlayerStore((state) => ({
     deviceId: state.deviceId,
     setCurrentTrack: state.setCurrentTrack,
   }));
-  const accessToken = useSpotifyStore((state) => state.accessToken);
+  const session = useSession();
 
   const handlePlayPause = () => {
     setUrl(props.track.preview_url);
@@ -243,18 +246,28 @@ const Track = (props: TrackPageProps) => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col flex-start w-full pt-10 pb-5">
-                <Text h4>Play the full song (Spotity premium users only):</Text>
-                <Text h5 color="error">
-                  * Spotify only allows limited users for this feature under
-                  development mode. Please send your spotify account email to
-                  musiccube@protonmail.com for granting access.{" "}
-                </Text>
-              </div>
-              <div className="flex flex-col gap-5 min-w-[300px] justify-around align-center border border-solid rounded-3xl p-5">
-                <SpotifyLoginButton />
-                <SpotifyPlayer />
-              </div>
+              {session.status === "authenticated" && (
+                <>
+                  <div className="flex flex-col flex-start w-full pt-10 pb-5">
+                    <Text h4>
+                      Play the full song (Spotity premium users only):
+                    </Text>
+                    <Text h5 color="error">
+                      * Spotify only allows limited users for this feature under
+                      development mode. Please send your spotify account email
+                      to musiccube@protonmail.com for granting access.
+                    </Text>
+                    <Text h5 color="error">
+                      * Support desktop browser only
+                    </Text>
+                  </div>
+                  <div className="flex flex-col gap-5 min-w-[300px] justify-around align-center border border-solid rounded-3xl p-5">
+                    <SpotifyLoginButton accessToken={props.accessToken || ""} />
+                    <SpotifyPlayerV2 accessToken={props.accessToken || ""} />
+                    <Controller accessToken={props.accessToken || ""} />
+                  </div>
+                </>
+              )}
             </div>
           </TabsContent>
           <TabsContent value="tab2">
@@ -360,6 +373,41 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
+  // Get the access token
+  let accessToken = null;
+  if (session) {
+    const refreshToken = await getRefreshToken(
+      session?.user?.name || "",
+      "Spotify"
+    );
+
+    const body = {
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    };
+
+    const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+    const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+
+    const tokenRes = await axios.post(
+      "https://accounts.spotify.com/api/token/",
+      new URLSearchParams(body).toString(),
+      {
+        headers: {
+          "Content-type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+            ).toString("base64"),
+        },
+      }
+    );
+
+    accessToken = tokenRes.data.access_token;
+  }
+
   return {
     props: {
       track: track,
@@ -368,6 +416,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       videos: videos || null,
       itunesURL: itunesURL,
       rating: rating,
+      accessToken: accessToken,
     },
   };
 };

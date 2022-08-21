@@ -23,32 +23,28 @@ const tokenHandler: NextApiHandler = async (req, res) => {
 
   const refreshToken = await getRefreshToken(session?.user?.name, provider);
 
-  let accessToken = null;
+  const body = {
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  };
 
-  if (provider === "Spotify") {
-    const body = {
-      grant_type: "refresh_token",
-      refresh_token: refreshToken,
-    };
+  const tokenRes = await axios.post(
+    "https://accounts.spotify.com/api/token/",
+    new URLSearchParams(body).toString(),
+    {
+      headers: {
+        "Content-type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString(
+            "base64"
+          ),
+      },
+    }
+  );
 
-    const tokenRes = await axios.post(
-      "https://accounts.spotify.com/api/token/",
-      new URLSearchParams(body).toString(),
-      {
-        headers: {
-          "Content-type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-          Authorization:
-            "Basic " +
-            Buffer.from(
-              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-            ).toString("base64"),
-        },
-      }
-    );
-
-    accessToken = tokenRes.data;
-  }
+  const accessToken = tokenRes.data.access_token;
 
   return res.status(201).json(accessToken);
 };

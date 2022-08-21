@@ -4,23 +4,14 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useSpotifyStore from "../../stores/useSpotifyStore";
 
-const SpotifyLoginButton = () => {
+interface SpotifyLoginButtonProps {
+  accessToken: string;
+}
+
+const SpotifyLoginButton = (props: SpotifyLoginButtonProps) => {
   const router = useRouter();
 
-  const { accessToken, setAccessToken } = useSpotifyStore();
-
-  useEffect(() => {
-    (async () => {
-      const res = await axios.get("/api/auth/token", {
-        params: {
-          provider: "Spotify",
-        },
-      });
-      setAccessToken(res.data);
-    })();
-  }, []);
-
-  if (accessToken) {
+  if (props.accessToken) {
     return <Button disabled>Spotify Connected</Button>;
   }
 

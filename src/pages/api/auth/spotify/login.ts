@@ -4,8 +4,8 @@ const spotifyLoginHandler: NextApiHandler = async (req, res) => {
   const client_id = process.env.SPOTIFY_CLIENT_ID;
   const redirect_uri = process.env.BASE_URL + "/api/auth/spotify/callback";
 
-  const scope =
-    "user-read-private user-read-email user-modify-playback-state user-read-playback-state user-read-currently-playing app-remote-control streaming";
+  const scope = "streaming user-read-email user-read-private";
+
   const query = {
     response_type: "code",
     client_id: client_id,
