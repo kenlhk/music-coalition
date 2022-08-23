@@ -12,7 +12,7 @@ import {
   BsApple,
   BsFillPlayCircleFill,
   BsPauseCircleFill,
-  BsSpotify,
+  BsSpotify
 } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { youtube } from "scrape-youtube";
@@ -24,7 +24,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "../../components/Tabs";
 import VideoCard from "../../components/VideoCard";
 import { saveArtist } from "../../lib/db/services/artist";
@@ -380,32 +380,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       session?.user?.name || "",
       "Spotify"
     );
+    if (refreshToken) {
+      const body = {
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      };
 
-    const body = {
-      grant_type: "refresh_token",
-      refresh_token: refreshToken,
-    };
+      const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+      const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
-    const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-    const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+      const tokenRes = await axios.post(
+        "https://accounts.spotify.com/api/token/",
+        new URLSearchParams(body).toString(),
+        {
+          headers: {
+            "Content-type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+            Authorization:
+              "Basic " +
+              Buffer.from(
+                `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+              ).toString("base64"),
+          },
+        }
+      );
 
-    const tokenRes = await axios.post(
-      "https://accounts.spotify.com/api/token/",
-      new URLSearchParams(body).toString(),
-      {
-        headers: {
-          "Content-type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-          Authorization:
-            "Basic " +
-            Buffer.from(
-              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-            ).toString("base64"),
-        },
-      }
-    );
-
-    accessToken = tokenRes.data.access_token;
+      accessToken = tokenRes.data.access_token;
+    }
   }
 
   return {

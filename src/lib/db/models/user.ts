@@ -17,6 +17,7 @@ interface UserType extends Document {
   friends: string[];
   posts: string[];
   comments: string[];
+  refreshTokens: Map<String, String>;
 }
 
 const Schema = mongoose.Schema;

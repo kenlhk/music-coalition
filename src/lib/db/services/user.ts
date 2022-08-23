@@ -44,8 +44,11 @@ export const saveRefreshToken = async (
 export const getRefreshToken = async (
   username: string,
   provider: string
-): Promise<string> => {
+): Promise<string | null> => {
   await connectToDb();
   const existingUser = await User.findOne({ username });
+  if (!existingUser || !existingUser.refreshTokens) {
+    return null;
+  }
   return existingUser.refreshTokens.get(provider);
 };
