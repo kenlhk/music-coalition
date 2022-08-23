@@ -25,7 +25,7 @@ const tokenHandler: NextApiHandler = async (req, res) => {
 
   const body = {
     grant_type: "refresh_token",
-    refresh_token: refreshToken,
+    refresh_token: refreshToken || "",
   };
 
   const tokenRes = await axios.post(
