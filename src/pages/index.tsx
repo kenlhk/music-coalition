@@ -3,7 +3,7 @@ import CoverParallax from "../components/CoverParallax";
 import { getServerAccessToken, spotifyApiWrapper } from "../lib/spotify";
 
 interface HomeProps {
-  sampleTracks: SpotifyApi.TrackObjectFull[];
+  sampleTracks?: SpotifyApi.TrackObjectFull[];
 }
 
 const Home = (props: HomeProps) => {

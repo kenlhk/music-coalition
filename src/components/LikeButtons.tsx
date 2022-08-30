@@ -18,8 +18,6 @@ interface LikeButtons {
 
 const LikeButtons = (props: LikeButtons) => {
   const [rating, setRating] = useState(props.rating);
-  const router = useRouter();
-  const trackId = router.query.trackId;
   const session = useSession();
 
   const handleLike = async () => {
