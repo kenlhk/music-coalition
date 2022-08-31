@@ -210,7 +210,7 @@ const Track = (props: TrackPageProps) => {
                 <div className="flex flex-col items-center">
                   <Text h4>Preview:</Text>
                   {props.track.preview_url ? (
-                    <a onClick={handlePlayPause}>
+                    <a onClick={handlePlayPause} data-cy="previewButton">
                       {playing ? (
                         <BsPauseCircleFill size={40} />
                       ) : (

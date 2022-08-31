@@ -49,6 +49,7 @@ const SearchBar = (props: SearchBarProps) => {
       labelLeft={<TbSearch size={20} color={"#555555"} />}
       aria-label="Search"
       bordered={props.bordered}
+      data-cy="searchBar"
     />
   );
 };
