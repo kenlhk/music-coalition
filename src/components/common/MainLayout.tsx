@@ -222,7 +222,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {children}
       </main>
       <BackgroundPlayer />
-      <Footer />
     </div>
   );
 };
